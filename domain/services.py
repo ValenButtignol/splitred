@@ -75,3 +75,37 @@ def calculate_group_balance(
         
     return balances
 
+def calculate_payments(balances: dict[User, float]) -> list[tuple[User, User, float]]:
+    creditors, debtors = _split_group_creditors_and_debtors(balances)
+    payments = []
+    
+    while creditors and debtors:
+        creditor, creditor_balance = creditors.pop(0)
+        debtor, debtor_balance = debtors.pop(0)
+        payment = min(creditor_balance, debtor_balance)
+        if creditor_balance > debtor_balance:
+            _insert_ordered(creditors, (creditor, creditor_balance - payment))
+
+        if debtor_balance > creditor_balance:
+            _insert_ordered(debtors, (debtor, debtor_balance - payment))
+
+        payments.append((creditor, debtor, payment))
+    
+    return payments
+
+def _split_group_creditors_and_debtors(balances: dict[User, float]) -> tuple[list[tuple[User, float]], list[tuple[User, float]]]:
+    creditors = []
+    debtors = []
+    for user, balance in sorted(balances.items(), key=lambda item: item[1], reverse=True):
+        if balance > 0:
+            creditors.append((user, balance))
+        else:
+            debtors.append((user, -balance))
+    return creditors, debtors
+
+def _insert_ordered(lst: list[tuple[User, float]], item: tuple[User, float]):
+    for i, (_, balance) in enumerate(lst):
+        if balance > item[1]:
+            lst.insert(i, item)
+            return
+    lst.append(item)
