@@ -23,6 +23,9 @@ class GroupRepository(ABC):
     @abstractmethod
     def add_user_to_group(self, group_id: int, user_id: int) -> None: pass
 
+    @abstractmethod
+    def get_members(self, group_id: int) -> list[User]: pass
+
 class ExpenseRepository(ABC):
     @abstractmethod
     def add(self, expense: Expense) -> None: pass
