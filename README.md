@@ -1,4 +1,4 @@
-# splitmate
+# splitred
 
 ## Download dependencies
 
@@ -22,11 +22,12 @@ flask run --host=0.0.0.0 --debug
 | `User`               | Generic user of the app                   | Unique ID + username                        |
 | `Group`              | Set of users that shares expenses         | Split expenses inside a group of people.    |
 | `Expense`            | Concrete expense                          | Contains amount, group, debtors, creditors  |
-| `Creditor`, `Debtor` | User roles inside an Expense              | `ExpenseShare` represents the role.         |
+| `Creditor`, `Debtor` | User roles inside an Expense              | Creditor implemented with tuples            |
 
 
 ## Use cases
-| Use Case                      | Description                                                           | Actors            | Domain Objects Involved     |
+
+| Use Case                     | Description                                                           | Actors            | Domain Objects Involved     |
 |------------------------------|-----------------------------------------------------------------------|-------------------|-----------------------------|
 | Create User                  | Register a new user in the system                                     | User              | User                        |
 | Create Group                 | Create a new group for shared expenses                                | User              | Group, User                 |

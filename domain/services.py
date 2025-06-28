@@ -1,5 +1,5 @@
 # Use Cases
-from domain.models import User, Group, Expense, ExpenseShare
+from domain.models import User, Group, Expense
 from application.ports import UserRepository, GroupRepository, ExpenseRepository
 
 # USERS
@@ -28,7 +28,7 @@ def add_user_to_group(group_repo: GroupRepository, group_id: int, user: User):
 
 
 # EXPENSES
-from domain.models import Expense, ExpenseShare
+from domain.models import Expense
 
 def create_expense(
     expense_repo: ExpenseRepository,
@@ -36,12 +36,15 @@ def create_expense(
     group_id: int,
     description: str,
     total_amount: float,
-    creditor_shares: list[ExpenseShare],
-    debtor_shares: list[ExpenseShare],
+    creditor_shares: list[tuple[User, float]],
+    debtor_shares: list[User],
 ) -> Expense:
     group = group_repo.get_by_id(group_id)
     if not group:
         raise ValueError("Group not found")
+
+    if sum(share for _, share in creditor_shares) != total_amount:
+        raise ValueError("Total amount of creditors does not match the total amount of the expense")
 
     expense = Expense(
         id=0,
@@ -54,20 +57,21 @@ def create_expense(
     expense_repo.add(expense)
     return expense
 
-def calculate_user_balance(
+def calculate_group_balance(
     expense_repo: ExpenseRepository,
+    group_repo: GroupRepository,
     group_id: int,
-    user_id: int
-) -> float:
+) -> dict[User, float]: # user -> balance
     expenses = expense_repo.list_by_group(group_id)
-    balance = 0.0
+    members = group_repo.get_members(group_id)
+    balances = {user: 0.0 for user in members}
 
+    # Calculate balances for each user
     for expense in expenses:
-        for creditor in expense.creditors:
-            if creditor.user_id == user_id:
-                balance += creditor.amount
+        for creditor, creditor_amount in expense.creditors:
+            balances[creditor] += creditor_amount
         for debtor in expense.debtors:
-            if debtor.user_id == user_id:
-                balance -= debtor.amount
+            balances[debtor] -= expense.total_amount / len(expense.debtors)
+        
+    return balances
 
-    return balance
