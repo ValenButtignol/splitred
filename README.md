@@ -1,4 +1,4 @@
-# splitred
+# Splitred
 
 ## Download dependencies
 
@@ -9,9 +9,23 @@ pip install -r requirements.txt
 ```
 
 ## Run
+
+Remember to activate your environment:
 ```
-flask run --host=0.0.0.0 --debug
+source venv/bin/activate
 ```
+
+Run flask server with:
+```
+flask run
+```
+
+If packages error appear, run:
+
+```
+export PYTHONPATH=$(pwd)
+```
+
 
 ## Classes
 
