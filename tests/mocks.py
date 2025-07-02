@@ -7,12 +7,6 @@ class MockUserRepository(UserRepository):
     def __init__(self):
         self.users = []
 
-    def get_by_username(self, username):
-        for u in self.users:
-            if u.username == username:
-                return u
-        return None
-
     def add(self, user: User):
         user.id = len(self.users) + 1
         self.users.append(user)

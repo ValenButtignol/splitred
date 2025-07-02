@@ -5,13 +5,9 @@ from application.ports import UserRepository, GroupRepository, ExpenseRepository
 # USERS
 
 def create_user(user_repo: UserRepository, username: str) -> User:
-    existing = user_repo.get_by_username(username)
-    if existing:
-        raise ValueError(f"Username '{username}' already taken.")
     new_user = User(id=0, username=username)
     user_repo.add(new_user)
     return new_user
-
 
 # GROUPS
 
