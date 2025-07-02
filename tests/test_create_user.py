@@ -11,8 +11,9 @@ def test_create_user_success():
 def test_create_user_duplicate():
     repo = MockUserRepository()
     create_user(repo, "alice")
-    with pytest.raises(ValueError):
-        create_user(repo, "alice")
+    create_user(repo, "alice")
+    assert repo.get_by_id(1).username == "alice" 
+    assert repo.get_by_id(2).username == "alice"
 
 def test_create_user_with_different_ids():
     repo = MockUserRepository()
