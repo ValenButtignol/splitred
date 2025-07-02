@@ -12,7 +12,7 @@ def create_user(user_repo: UserRepository, username: str) -> User:
 # GROUPS
 
 def create_group(group_repo: GroupRepository, name: str, owner: User) -> Group:
-    group = Group(id=0, name=name, members=[owner])
+    group = Group(id=0, name=name, owner=owner, members=[owner])
     group_repo.add(group)
     return group
 

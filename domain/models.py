@@ -18,6 +18,7 @@ class User:
 class Group:
     id: int
     name: str
+    owner: User
     members: List[User] = field(default_factory=list)
 
 @dataclass
