@@ -32,12 +32,20 @@ expense_debtors = Table(
     Column("member_id", Integer, ForeignKey("members.id")),
 )
 
+group_owners = Table(
+    "group_owners",
+    Base.metadata,
+    Column("group_id", Integer, ForeignKey("groups.id")),
+    Column("user_id", Integer, ForeignKey("users.id"))
+)
+
 class GroupDB(Base):
     __tablename__ = "groups"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
-    owners = relationship("UserDB", backref="owned_groups")
+    owners = relationship("UserDB", secondary=group_owners)
     members = relationship("MemberDB", back_populates="group", cascade="all, delete-orphan")
+
 
 class ExpenseDB(Base):
     __tablename__ = "expenses"
