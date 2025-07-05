@@ -15,11 +15,22 @@ class User:
         return hash(self.id)
 
 @dataclass
+class Member:
+    id: int
+    username: str
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __hash__(self):
+        return hash(self.id)
+
+@dataclass
 class Group:
     id: int
     name: str
-    owner: User
-    members: List[User] = field(default_factory=list)
+    owners: List[User] = field(default_factory=list)
+    members: List[Member] = field(default_factory=list)
 
 @dataclass
 class Expense:
@@ -27,5 +38,5 @@ class Expense:
     description: str
     total_amount: float
     group_id: int
-    creditors: List[tuple[User, float]] = field(default_factory=list)
-    debtors: List[User] = field(default_factory=list)
+    creditors: List[tuple[Member, float]] = field(default_factory=list)
+    debtors: List[Member] = field(default_factory=list)

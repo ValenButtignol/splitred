@@ -1,7 +1,6 @@
 from flask import request, jsonify
-from application.ports import UserRepository
-from domain.services import create_user, create_group
-from infrastructure.db.repository import SQLAlchemyUserRepository, SQLAlchemyGroupRepository
+from domain.services import create_user, create_group, create_member, get_user_by_id, add_member_to_group, get_group_by_id
+from infrastructure.db.repository import SQLAlchemyUserRepository, SQLAlchemyGroupRepository, SQLAlchemyMemberRepository
 from infrastructure.db import SessionLocal
 from infrastructure.db.models import UserDB, GroupDB
 
@@ -12,13 +11,11 @@ def register_routes(app):
     @app.route("/users", methods=["POST"])
     def post_user():
         session = SessionLocal()
-        repo: UserRepository = SQLAlchemyUserRepository(session)
+        repo = SQLAlchemyUserRepository(session)
         try:
             data = request.get_json()
             username = data["username"]
-            print("Creating user", username)
             user = create_user(repo, username)
-            print("Created user", user)
             return jsonify({
                 "id": user.id,
                 "username": user.username
@@ -33,7 +30,6 @@ def register_routes(app):
     @app.route("/users", methods=["GET"])
     def get_users():
         session = SessionLocal()
-
         try:
             users = session.query(UserDB).all()
             return jsonify([
@@ -48,7 +44,6 @@ def register_routes(app):
     @app.route("/users/<int:user_id>", methods=["GET"])
     def get_user(user_id):
         session = SessionLocal()
-
         try:
             user = session.query(UserDB).filter_by(id=user_id).first()
             if not user:
@@ -71,7 +66,7 @@ def register_routes(app):
             name = data["name"]
             owner_id = data["owner_id"]
 
-            owner = user_repo.get_by_id(owner_id)
+            owner = get_user_by_id(user_repo, owner_id) # type: ignore
             if not owner:
                 return jsonify({"error": "Owner not found"}), 404
 
@@ -80,7 +75,7 @@ def register_routes(app):
                 "id": group.id,
                 "name": group.name,
                 "members": [member.username for member in group.members],
-                "owner": group.owner.username
+                "owner_ids": [owner.id for owner in group.owners]
             }), 201
 
         except ValueError as e:
@@ -99,7 +94,7 @@ def register_routes(app):
                 "id": group.id, 
                 "name": group.name, 
                 "members": [member.username for member in group.members], 
-                "owner_id": group.owner_id
+                "owner_ids": [owner.id for owner in group.owners]
                 } for group in groups
             ])
         except Exception as e:
@@ -107,3 +102,61 @@ def register_routes(app):
         finally:
             session.close()
 
+    @app.route("/groups/<int:group_id>", methods=["GET"])
+    def get_group(group_id):
+        session = SessionLocal()
+        try:
+            group = session.query(GroupDB).filter_by(id=group_id).first()
+            if not group:
+                return jsonify({"error": "Group not found"}), 404
+            return jsonify({
+                "id": group.id, 
+                "name": group.name, 
+                "members": [member.username for member in group.members],
+                "owner_ids": [owner.id for owner in group.owners]
+            })
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        finally:
+            session.close()
+
+    # MEMBERS
+
+    @app.route("/groups/<int:group_id>/members", methods=["POST"])
+    def post_member(group_id):
+        session = SessionLocal()
+        group_repo = SQLAlchemyGroupRepository(session)
+        member_repo = SQLAlchemyMemberRepository(session)
+        try:
+            data = request.get_json()
+            member_username = data["username"]
+            group = get_group_by_id(group_repo, group_id) # type: ignore
+            member = create_member(member_repo, member_username)
+            add_member_to_group(group_repo, group_id, member)
+            
+            session.commit()
+            return jsonify({
+                "id": group.id,
+                "name": group.name,
+                "members": [member.username for member in group.members],
+                "owner_ids": [owner.id for owner in group.owners]
+            }), 201
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        finally:
+            session.close()
+
+    @app.route("/groups/<int:group_id>/members", methods=["GET"])
+    def get_members(group_id):
+        session = SessionLocal()
+        group_repo = SQLAlchemyGroupRepository(session)
+        try:
+            group = get_group_by_id(group_repo, group_id) # type: ignore
+            return jsonify([member.username for member in group.members])
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        finally:
+            session.close()
+
+    # EXPENSES
+    

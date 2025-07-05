@@ -1,6 +1,6 @@
 # Use Cases
-from domain.models import User, Group, Expense
-from application.ports import UserRepository, GroupRepository, ExpenseRepository
+from domain.models import User, Group, Expense, Member
+from application.ports import UserRepository, GroupRepository, ExpenseRepository, MemberRepository
 
 # USERS
 
@@ -9,18 +9,61 @@ def create_user(user_repo: UserRepository, username: str) -> User:
     user_repo.add(new_user)
     return new_user
 
+def get_user_by_id(user_repo: UserRepository, user_id: int) -> User:
+    user = user_repo.get_by_id(user_id)
+    if not user:
+        raise ValueError("User not found")
+    return user
+
+# MEMBERS
+
+def create_member(member_repo: MemberRepository, username: str) -> Member:
+    new_member = Member(id=0, username=username)
+    member_repo.add(new_member)
+    return new_member
+
+def get_member_by_id(member_repo: MemberRepository, member_id: int) -> Member:
+    member = member_repo.get_by_id(member_id)
+    if not member:
+        raise ValueError("Member not found")
+    return member
+
 # GROUPS
 
+def get_group_by_id(group_repo: GroupRepository, group_id: int) -> Group:
+    group = group_repo.get_by_id(group_id)
+    if not group:
+        raise ValueError("Group not found")
+    return group
+
 def create_group(group_repo: GroupRepository, name: str, owner: User) -> Group:
-    group = Group(id=0, name=name, owner=owner, members=[owner])
+    group = Group(id=0, name=name, owners=[owner])
     group_repo.add(group)
     return group
 
-def add_user_to_group(group_repo: GroupRepository, group_id: int, user: User):
-    group = group_repo.get_by_id(group_id)
-    if user in group.members:
-        raise ValueError("User is already in the group")
-    group_repo.add_user_to_group(group_id, user.id)
+def add_owner_to_group(group_repo: GroupRepository, group_id: int, owner: User):
+    group = get_group_by_id(group_repo, group_id)
+    if owner in group.owners:
+        raise ValueError("Owner is already in the group")
+    group_repo.add_owner(group_id, owner)
+
+def add_member_to_group(group_repo: GroupRepository, group_id: int, member: Member):
+    group = get_group_by_id(group_repo, group_id)
+    if member in group.members:
+        raise ValueError("Member is already in the group")
+    group_repo.add_member(group_id, member)
+
+def remove_member_from_group(group_repo: GroupRepository, expense_repo: ExpenseRepository, group_id: int, member: Member):
+    group = get_group_by_id(group_repo, group_id)
+    if member not in group.members:
+        raise ValueError("Member is not in the group")
+    expenses = expense_repo.list_by_group(group_id)
+    for expense in expenses:
+        if member in expense.creditors:
+            raise ValueError("Member is in an expense of the group")
+        if member in expense.debtors:
+            raise ValueError("Member is in an expense of the group")
+    group_repo.remove_member(group_id, member)
 
 
 # EXPENSES
@@ -32,10 +75,10 @@ def create_expense(
     group_id: int,
     description: str,
     total_amount: float,
-    creditor_shares: list[tuple[User, float]],
-    debtor_shares: list[User],
+    creditor_shares: list[tuple[Member, float]],
+    debtor_shares: list[Member],
 ) -> Expense:
-    group = group_repo.get_by_id(group_id)
+    group = get_group_by_id(group_repo, group_id)
     if not group:
         raise ValueError("Group not found")
 
@@ -57,12 +100,12 @@ def calculate_group_balance(
     expense_repo: ExpenseRepository,
     group_repo: GroupRepository,
     group_id: int,
-) -> dict[User, float]: # user -> balance
+) -> dict[Member, float]: # member -> balance
     expenses = expense_repo.list_by_group(group_id)
     members = group_repo.get_members(group_id)
-    balances = {user: 0.0 for user in members}
+    balances = {member: 0.0 for member in members}
 
-    # Calculate balances for each user
+    # Calculate balances for each member
     for expense in expenses:
         for creditor, creditor_amount in expense.creditors:
             balances[creditor] += creditor_amount
@@ -71,7 +114,7 @@ def calculate_group_balance(
         
     return balances
 
-def calculate_payments(balances: dict[User, float]) -> list[tuple[User, User, float]]:
+def calculate_payments(balances: dict[Member, float]) -> list[tuple[Member, Member, float]]:
     creditors, debtors = _split_group_creditors_and_debtors(balances)
     payments = []
     
@@ -89,17 +132,17 @@ def calculate_payments(balances: dict[User, float]) -> list[tuple[User, User, fl
     
     return payments
 
-def _split_group_creditors_and_debtors(balances: dict[User, float]) -> tuple[list[tuple[User, float]], list[tuple[User, float]]]:
+def _split_group_creditors_and_debtors(balances: dict[Member, float]) -> tuple[list[tuple[Member, float]], list[tuple[Member, float]]]:
     creditors = []
     debtors = []
-    for user, balance in sorted(balances.items(), key=lambda item: item[1], reverse=True):
+    for member, balance in sorted(balances.items(), key=lambda item: item[1], reverse=True):
         if balance > 0:
-            creditors.append((user, balance))
+            creditors.append((member, balance))
         else:
-            debtors.append((user, -balance))
+            debtors.append((member, -balance))
     return creditors, debtors
 
-def _insert_ordered(lst: list[tuple[User, float]], item: tuple[User, float]):
+def _insert_ordered(lst: list[tuple[Member, float]], item: tuple[Member, float]):
     for i, (_, balance) in enumerate(lst):
         if balance > item[1]:
             lst.insert(i, item)
