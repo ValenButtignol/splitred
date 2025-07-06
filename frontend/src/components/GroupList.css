@@ -1,0 +1,43 @@
+.group-list {
+  text-align: center;
+}
+
+.section-title {
+  color: #838383;
+  margin-bottom: 1rem;
+}
+
+.group-card {
+  background-color: #252525;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 300px;
+  margin: 0 auto;
+}
+
+.empty-text {
+  color: #5e5e5e;
+  margin-bottom: 1.5rem;
+}
+
+.group-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.circle-button {
+  background-color: #191919;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.circle-button:hover {
+  background-color: #2e2e2e;
+}
