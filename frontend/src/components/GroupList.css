@@ -8,11 +8,28 @@
 }
 
 .group-card {
+  text-align: center;
   background-color: #252525;
   border-radius: 12px;
   padding: 2rem;
-  width: 300px;
+  max-width: 600px;
+  width: 90%;
   margin: 0 auto;
+}
+
+@media screen and (min-width: 1024px) {
+  .group-card {
+    width: 600px;
+  }
+  .group-list {
+    text-align: left;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .group-card {
+    width: 400px;
+  }
 }
 
 .empty-text {
@@ -30,7 +47,7 @@
   background-color: #191919;
   color: white;
   border: none;
-  border-radius: 50%;
+  border-radius: 12px;
   width: 42px;
   height: 42px;
   font-size: 1.2rem;

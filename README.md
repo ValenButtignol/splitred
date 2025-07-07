@@ -9,7 +9,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## Run
+## Run Backend Server
 
 Remember to activate your environment:
 ```
@@ -25,6 +25,13 @@ If packages error appear, run:
 
 ```
 export PYTHONPATH=$(pwd)
+```
+
+## Run Frontend Server
+
+```
+cd frontend
+npm run dev
 ```
 
 

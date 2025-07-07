@@ -20,7 +20,25 @@
 .logo {
   width: 35px;
   height: 35px;
-  margin-right: 0.1rem;
+  margin-right: 0.3rem;
   vertical-align: middle;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.25rem;
+}
+
+.info-icon {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.info-icon:hover {
+  transform: scale(1.1);
+}
+
+.back-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
