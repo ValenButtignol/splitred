@@ -6,8 +6,7 @@ from typing import List
 @dataclass
 class User:
     id: int
-    username: str
-
+    
     def __eq__(self, other):
         return self.id == other.id
 

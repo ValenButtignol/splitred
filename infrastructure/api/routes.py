@@ -14,11 +14,9 @@ def register_routes(app):
         repo = SQLAlchemyUserRepository(session)
         try:
             data = request.get_json()
-            username = data["username"]
-            user = create_user(repo, username)
+            user = create_user(repo)
             return jsonify({
                 "id": user.id,
-                "username": user.username
             }), 201
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
@@ -33,7 +31,7 @@ def register_routes(app):
         try:
             users = session.query(UserDB).all()
             return jsonify([
-                {"id": user.id, "username": user.username}
+                {"id": user.id}
                 for user in users
             ])
         except Exception as e:
@@ -48,7 +46,7 @@ def register_routes(app):
             user = session.query(UserDB).filter_by(id=user_id).first()
             if not user:
                 return jsonify({"error": "User not found"}), 404
-            return jsonify({"id": user.id, "username": user.username})
+            return jsonify({"id": user.id})
         except Exception as e:
             return jsonify({"error": str(e)}), 500
         finally:
@@ -65,14 +63,15 @@ def register_routes(app):
             data = request.get_json()
             name = data["name"]
             owner_id = data["owner_id"]
+            members = data["members"]
 
             owner = get_user_by_id(user_repo, owner_id) # type: ignore
             if not owner:
                 return jsonify({"error": "Owner not found"}), 404
 
-            group = create_group(group_repo, name, owner)
+            group = create_group(group_repo, name, owner, members)
             return jsonify({
-                "id": group.id,
+                "id": str(group.id),
                 "name": group.name,
                 "members": [member.username for member in group.members],
                 "owner_ids": [owner.id for owner in group.owners]

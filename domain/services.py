@@ -4,8 +4,8 @@ from application.ports import UserRepository, GroupRepository, ExpenseRepository
 
 # USERS
 
-def create_user(user_repo: UserRepository, username: str) -> User:
-    new_user = User(id=0, username=username)
+def create_user(user_repo: UserRepository) -> User:
+    new_user = User(id=0)
     user_repo.add(new_user)
     return new_user
 
@@ -36,8 +36,8 @@ def get_group_by_id(group_repo: GroupRepository, group_id: int) -> Group:
         raise ValueError("Group not found")
     return group
 
-def create_group(group_repo: GroupRepository, name: str, owner: User) -> Group:
-    group = Group(id=0, name=name, owners=[owner])
+def create_group(group_repo: GroupRepository, name: str, owner: User, members: list[Member]) -> Group:
+    group = Group(id=0, name=name, owners=[owner], members=members)
     group_repo.add(group)
     return group
 

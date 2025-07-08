@@ -10,10 +10,10 @@ class SQLAlchemyUserRepository(UserRepository):
 
     def get_by_id(self, user_id: int) -> User | None:
         db_user = self.session.query(UserDB).filter_by(id=user_id).first()
-        return User(id=db_user.id, username=db_user.username) if db_user else None
+        return User(id=db_user.id) if db_user else None
 
     def add(self, user: User) -> None:
-        db_user = UserDB(username=user.username)
+        db_user = UserDB()
         self.session.add(db_user)
         self.session.commit()
         user.id = db_user.id # type: ignore
@@ -43,7 +43,7 @@ class SQLAlchemyGroupRepository(GroupRepository):
         return Group(
             id=db_group.id,
             name=db_group.name,
-            owners=[User(id=u.id, username=u.username) for u in db_group.owners],
+            owners=[User(id=u.id) for u in db_group.owners],
             members=[
                 Member(id=u.id, username=u.username) for u in db_group.members
             ]
@@ -71,14 +71,14 @@ class SQLAlchemyGroupRepository(GroupRepository):
         self.session.commit()
 
     def add_owner(self, group_id: int, owner: User) -> None:
-        db_owner = UserDB(username=owner.username)
+        db_owner = UserDB()
         self.session.add(db_owner)
         self.session.commit()
         owner.id = db_owner.id # type: ignore
 
     def get_owners(self, group_id: int) -> list[User]:
         db_group = self.session.query(GroupDB).filter_by(id=group_id).first()
-        return [User(id=u.id, username=u.username) for u in db_group.owners] if db_group else []
+        return [User(id=u.id) for u in db_group.owners] if db_group else []
 
 class SQLAlchemyExpenseRepository(ExpenseRepository):
     def __init__(self, session):

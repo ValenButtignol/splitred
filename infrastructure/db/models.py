@@ -1,15 +1,17 @@
 # SQLAlchemy Models
 
+import uuid
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float, Table, ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import UUID
 
 Base = declarative_base()
 
 class UserDB(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String, nullable=False)
 
 class MemberDB(Base):
     __tablename__ = "members"
@@ -41,7 +43,7 @@ group_owners = Table(
 
 class GroupDB(Base):
     __tablename__ = "groups"
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     owners = relationship("UserDB", secondary=group_owners)
     members = relationship("MemberDB", back_populates="group", cascade="all, delete-orphan")
