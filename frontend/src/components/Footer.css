@@ -2,7 +2,11 @@
   color: #5e5e5e;
   text-align: center;
   padding: 1rem;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .footer a {
@@ -13,4 +17,24 @@
 
 .footer a:hover {
   text-decoration: underline;
+}
+
+.github-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease;
+}
+
+.github-icon:hover {
+  transform: scale(1.1);
+}
+
+.linkedin-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease;
+}
+
+.linkedin-icon:hover {
+  transform: scale(1.1);
 }

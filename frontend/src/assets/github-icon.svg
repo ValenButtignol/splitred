@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="1080" height="1080" viewBox="0 0 1080 1080" xml:space="preserve">
+<desc>Created with Fabric.js 5.2.4</desc>
+<defs>
+</defs>
+<g transform="matrix(1 0 0 1 540 540)" id="9a3bbf8f-0738-4ab7-86c6-14b71e81a1f5"  >
+<rect style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; visibility: hidden;" vector-effect="non-scaling-stroke"  x="-540" y="-540" rx="0" ry="0" width="1080" height="1080" />
+</g>
+<g transform="matrix(1 0 0 1 540 540)" id="f5a36e78-8d53-417f-8495-e762b34bf8d5"  >
+</g>
+<g transform="matrix(52.55 0 0 52.55 539.91 539.91)" id="github-[#142]"  >
+<path style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(211,211,211); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-94, -7409)" d="M 94 7399 C 99.523 7399 104 7403.59 104 7409.253 C 104 7413.782 101.138 7417.624 97.167 7418.981 C 96.66 7419.082 96.48 7418.762 96.48 7418.489 C 96.48 7418.151 96.492 7417.047 96.492 7415.675 C 96.492 7414.719 96.172 7414.095 95.813 7413.777 C 98.04 7413.523 100.38 7412.656 100.38 7408.718 C 100.38 7407.598 99.992 7406.684 99.35 7405.966 C 99.454 7405.707 99.797 7404.664 99.252 7403.252 C 99.252 7403.252 98.414 7402.977 96.505 7404.303 C 95.706 7404.076 94.85 7403.962 94 7403.958 C 93.15 7403.962 92.295 7404.076 91.497 7404.303 C 89.586 7402.977 88.746 7403.252 88.746 7403.252 C 88.203 7404.664 88.546 7405.707 88.649 7405.966 C 88.01 7406.684 87.619 7407.598 87.619 7408.718 C 87.619 7412.646 89.954 7413.526 92.175 7413.785 C 91.889 7414.041 91.63 7414.493 91.54 7415.156 C 90.97 7415.418 89.522 7415.871 88.63 7414.304 C 88.63 7414.304 88.101 7413.319 87.097 7413.247 C 87.097 7413.247 86.122 7413.234 87.029 7413.87 C 87.029 7413.87 87.684 7414.185 88.139 7415.37 C 88.139 7415.37 88.726 7417.2 91.508 7416.58 C 91.513 7417.437 91.522 7418.245 91.522 7418.489 C 91.522 7418.76 91.338 7419.077 90.839 7418.982 C 86.865 7417.627 84 7413.783 84 7409.253 C 84 7403.59 88.478 7399 94 7399" stroke-linecap="round" />
+</g>
+<g transform="matrix(NaN NaN NaN NaN 0 0)"  >
+<g style=""   >
+</g>
+</g>
+</svg>
