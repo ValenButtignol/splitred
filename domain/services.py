@@ -1,4 +1,5 @@
 # Use Cases
+from click import group
 from domain.models import User, Group, Expense, Member
 from application.ports import UserRepository, GroupRepository, ExpenseRepository, MemberRepository
 
@@ -17,43 +18,42 @@ def get_user_by_id(user_repo: UserRepository, user_id: int) -> User:
 
 # MEMBERS
 
-def create_member(member_repo: MemberRepository, username: str) -> Member:
-    new_member = Member(id=0, username=username)
-    member_repo.add(new_member)
+def create_member(member_repo: MemberRepository, username: str, group_id: str) -> Member:
+    new_member = Member(id=0, username=username, group_id=group_id)
+    member_repo.add(new_member, group_id)
     return new_member
 
-def get_member_by_id(member_repo: MemberRepository, member_id: int) -> Member:
-    member = member_repo.get_by_id(member_id)
+def get_member_by_id(member_repo: MemberRepository, member_id: int, group_id: str) -> Member:
+    member = member_repo.get_by_id(member_id, group_id)
     if not member:
         raise ValueError("Member not found")
     return member
 
 # GROUPS
 
-def get_group_by_id(group_repo: GroupRepository, group_id: int) -> Group:
+def get_group_by_id(group_repo: GroupRepository, group_id: str) -> Group:
     group = group_repo.get_by_id(group_id)
     if not group:
         raise ValueError("Group not found")
     return group
 
-def create_group(group_repo: GroupRepository, name: str, owner: User, members: list[Member]) -> Group:
-    group = Group(id=0, name=name, owners=[owner], members=members)
+def create_group(group_repo: GroupRepository, name: str, owner: User) -> Group:
+    group = Group(id="", name=name, owners=[owner])
     group_repo.add(group)
+    group_repo.add_owner(group.id, owner)
     return group
 
-def add_owner_to_group(group_repo: GroupRepository, group_id: int, owner: User):
+def add_owner_to_group(group_repo: GroupRepository, group_id: str, owner: User):
     group = get_group_by_id(group_repo, group_id)
     if owner in group.owners:
         raise ValueError("Owner is already in the group")
     group_repo.add_owner(group_id, owner)
 
-def add_member_to_group(group_repo: GroupRepository, group_id: int, member: Member):
+def add_member_to_group(group_repo: GroupRepository, group_id: str, member: Member):
     group = get_group_by_id(group_repo, group_id)
-    if member in group.members:
-        raise ValueError("Member is already in the group")
     group_repo.add_member(group_id, member)
 
-def remove_member_from_group(group_repo: GroupRepository, expense_repo: ExpenseRepository, group_id: int, member: Member):
+def remove_member_from_group(group_repo: GroupRepository, expense_repo: ExpenseRepository, group_id: str, member: Member):
     group = get_group_by_id(group_repo, group_id)
     if member not in group.members:
         raise ValueError("Member is not in the group")
@@ -72,7 +72,7 @@ from domain.models import Expense
 def create_expense(
     expense_repo: ExpenseRepository,
     group_repo: GroupRepository,
-    group_id: int,
+    group_id: str,
     description: str,
     total_amount: float,
     creditor_shares: list[tuple[Member, float]],
@@ -99,7 +99,7 @@ def create_expense(
 def calculate_group_balance(
     expense_repo: ExpenseRepository,
     group_repo: GroupRepository,
-    group_id: int,
+    group_id: str,
 ) -> dict[Member, float]: # member -> balance
     expenses = expense_repo.list_by_group(group_id)
     members = group_repo.get_members(group_id)

@@ -11,32 +11,32 @@ class UserRepository(ABC):
 
 class MemberRepository(ABC):
     @abstractmethod
-    def get_by_id(self, member_id: int) -> Member: pass
+    def get_by_id(self, member_id: int, group_id: str) -> Member: pass
 
     @abstractmethod
-    def add(self, member: Member) -> None: pass
+    def add(self, member: Member, group_id:str) -> None: pass
 
 class GroupRepository(ABC):
     @abstractmethod
-    def get_by_id(self, group_id: int) -> Group: pass
+    def get_by_id(self, group_id: str) -> Group: pass
 
     @abstractmethod
     def add(self, group: Group) -> None: pass
 
     @abstractmethod
-    def add_member(self, group_id: int, member: Member) -> None: pass
+    def add_member(self, group_id: str, member: Member) -> None: pass
 
     @abstractmethod
-    def get_members(self, group_id: int) -> list[Member]: pass
+    def get_members(self, group_id: str) -> list[Member]: pass
 
     @abstractmethod
-    def remove_member(self, group_id: int, member: Member) -> None: pass
+    def remove_member(self, group_id: str, member: Member) -> None: pass
 
     @abstractmethod
-    def add_owner(self, group_id: int, owner: User) -> None: pass
+    def add_owner(self, group_id: str, owner: User) -> None: pass
     
     @abstractmethod
-    def get_owners(self, group_id: int) -> list[User]: pass
+    def get_owners(self, group_id: str) -> list[User]: pass
 
 
 class ExpenseRepository(ABC):
@@ -44,4 +44,4 @@ class ExpenseRepository(ABC):
     def add(self, expense: Expense) -> None: pass
 
     @abstractmethod
-    def list_by_group(self, group_id: int) -> list[Expense]: pass
+    def list_by_group(self, group_id: str) -> list[Expense]: pass

@@ -1,6 +1,7 @@
 import "./CreateGroupModal.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../lib/constants";
 
 type Props = {
   onClose: () => void;
@@ -8,18 +9,49 @@ type Props = {
 
 export default function CreateGroupModal({ onClose }: Props) {
   const [groupName, setGroupName] = useState("");
+  const [memberInput, setMemberInput] = useState("");
+  const [members, setMembers] = useState<string[]>([]);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const userId = getOrCreateUserId(); // Función auxiliar
 
+  const handleAddMember = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && memberInput.trim() !== "") {
+      e.preventDefault();
+      if (!members.includes(memberInput.trim())) {
+        setMembers([...members, memberInput.trim()]);
+        setMemberInput("");
+      }
+    }
+  };
+
+  const handleRemoveMember = (name: string) => {
+    setMembers(members.filter((m) => m !== name));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (groupName.trim() === "") return;
 
-    // Acá podrías hacer un POST al backend y obtener un ID real
-    const fakeGroupId = encodeURIComponent(groupName.trim());
+    try {
+      const res = await fetch(`${API_URL}/groups`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: groupName.trim(),
+          owner_id: userId,
+          members: members,
+        }),
+      });
 
-    navigate(`/group/${fakeGroupId}`);
-    onClose();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Unknown error");
+
+      navigate(`/group/${data.id}`);
+      onClose();
+    } catch (err) {
+      alert("Error creating group: " + err);
+    }
   };
 
   return (
@@ -34,6 +66,31 @@ export default function CreateGroupModal({ onClose }: Props) {
             onChange={(e) => setGroupName(e.target.value)}
             className="modal-input"
           />
+
+          <input
+            type="text"
+            placeholder="Add member and press Enter"
+            value={memberInput}
+            onChange={(e) => setMemberInput(e.target.value)}
+            onKeyDown={handleAddMember}
+            className="modal-input"
+          />
+
+          <div className="member-list">
+            {members.map((member) => (
+              <div key={member} className="member-chip">
+                {member}
+                <button
+                  type="button"
+                  className="remove-btn"
+                  onClick={() => handleRemoveMember(member)}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+
           <button type="submit" className="modal-button">
             Create
           </button>
@@ -41,4 +98,14 @@ export default function CreateGroupModal({ onClose }: Props) {
       </div>
     </div>
   );
+}
+
+// Crea o recupera el user_id desde localStorage
+function getOrCreateUserId(): string {
+  let id = localStorage.getItem("user_id");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("user_id", id);
+  }
+  return id;
 }
