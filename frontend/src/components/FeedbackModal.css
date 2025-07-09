@@ -1,0 +1,21 @@
+@import "./CreateGroupModal.css"; /* Reutiliza estilos de modal base */
+
+.feedback-textarea {
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #191919;
+  color: white;
+  resize: vertical;
+}
+
+.feedback-status {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #d3d3d3;
+}
+
+.feedback-status.error {
+  color: #ff7373;
+}
