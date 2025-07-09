@@ -1,3 +1,4 @@
+/* GroupList.css */
 .group-list {
   text-align: center;
 }
@@ -41,6 +42,7 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 .circle-button {
@@ -57,4 +59,33 @@
 
 .circle-button:hover {
   background-color: #2e2e2e;
+}
+
+.group-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.group-preview {
+  background-color: #191919;
+  color: #d3d3d3;
+  text-align: left;
+  padding: 1rem;
+  border-radius: 10px;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.group-preview:hover {
+  background-color: #2e2e2e;
+}
+
+.group-preview-members {
+  color: #5e5e5e;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
 }
