@@ -76,6 +76,22 @@ class SQLAlchemyGroupRepository(GroupRepository):
             ]
         )
 
+    def get_groups_by_owner_id(self, owner_id: str) -> list[Group]:
+        db_groups_owners = self.session.query(GroupOwnerDB).filter_by(user_id=owner_id).all()
+        db_groups = []
+        for db_group_owner in db_groups_owners:
+            db_group = self.session.query(GroupDB).filter_by(id=db_group_owner.group_id).first()
+            if db_group:
+                db_groups.append(db_group)
+
+        return [Group(
+            id=db_group.id,
+            name=db_group.name,
+            owners=[User(id=gp.user_id) for gp in db_group.owners],
+            members=[
+                Member(id=m.id, username=m.username, group_id=m.group_id) for m in db_group.members
+            ]) for db_group in db_groups]
+
     def add(self, group: Group) -> None:
         db_group = GroupDB(name=group.name)
         self.session.add(db_group)
