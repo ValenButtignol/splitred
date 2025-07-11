@@ -3,6 +3,7 @@ from sqlalchemy import String, Float, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -30,7 +31,10 @@ class GroupDB(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String, nullable=False)
-
+    updated_at: Mapped[datetime] = mapped_column(
+            default=datetime.now(),
+            onupdate=datetime.now()
+        )
     # Users that own this group
     owners: Mapped[list["GroupOwnerDB"]] = relationship(
         back_populates="group", cascade="all, delete-orphan"
