@@ -1,0 +1,43 @@
+.group-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #252525;
+  border-radius: 12px;
+  color: #d3d3d3;
+  text-align: center;
+}
+
+.group-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.group-subtitle {
+  font-size: 1.2rem;
+  color: #838383;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.group-members {
+  list-style: none;
+  padding: 0;
+}
+
+.group-member {
+  color: #aaaaaa;
+  margin: 0.25rem 0;
+}
+
+.group-error {
+  color: #ff6b6b;
+  text-align: center;
+  padding: 2rem;
+}
+
+.group-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #aaaaaa;
+}
