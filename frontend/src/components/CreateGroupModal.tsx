@@ -13,7 +13,7 @@ export default function CreateGroupModal({ onClose }: Props) {
   const [members, setMembers] = useState<string[]>([]);
   const navigate = useNavigate();
 
-  const userId = getOrCreateUserId(); // Función auxiliar
+  const userId = localStorage.getItem("user_id");
 
   const handleAddMember = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && memberInput.trim() !== "") {
@@ -47,7 +47,7 @@ export default function CreateGroupModal({ onClose }: Props) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Unknown error");
 
-      navigate(`/group/${data.id}`);
+      navigate(`/groups/${data.id}?owner_id=${userId}`);
       onClose();
     } catch (err) {
       alert("Error creating group: " + err);
@@ -98,14 +98,4 @@ export default function CreateGroupModal({ onClose }: Props) {
       </div>
     </div>
   );
-}
-
-// Crea o recupera el user_id desde localStorage
-function getOrCreateUserId(): string {
-  let id = localStorage.getItem("user_id");
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem("user_id", id);
-  }
-  return id;
 }

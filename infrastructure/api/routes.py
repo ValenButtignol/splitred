@@ -94,38 +94,57 @@ def register_routes(app):
     @app.route("/groups", methods=["GET"])
     def get_groups():
         session = SessionLocal()
+        group_repo = SQLAlchemyGroupRepository(session)
+
         try:
-            session.flush()
-            groups = session.query(GroupDB).all()
+            owner_id = request.args.get("owner_id")
+            if owner_id:
+                groups = group_repo.get_groups_by_owner_id(owner_id)
+            else:
+                groups = []
+
             return jsonify([{
                 "id": str(group.id), 
                 "name": group.name, 
                 "members": [member.username for member in group.members], 
-                "owner_ids": [str(owner) for owner in group.owners]
-                } for group in groups
-            ])
+                "owner_ids": [str(owner.id) for owner in group.owners]
+            } for group in groups])
         except Exception as e:
             return jsonify({"error": str(e)}), 500
         finally:
             session.close()
 
-    @app.route("/groups/<int:group_id>", methods=["GET"])
-    def get_group(group_id):
+
+    @app.route("/groups/<group_id>", methods=["GET"])
+    def get_group(group_id: str):
         session = SessionLocal()
         try:
+            owner_id = request.args.get("owner_id")
+
+            if not owner_id:
+                return jsonify({"error": "Missing owner_id"}), 400
+
             group = session.query(GroupDB).filter_by(id=group_id).first()
+
             if not group:
                 return jsonify({"error": "Group not found"}), 404
+
+            # Only allows owners of the group to access to the group data.
+            if not any(str(owner.id) == owner_id for owner in group.owners):
+                return jsonify({"error": "Access denied: not an owner of this group"}), 403
+
             return jsonify({
-                "id": group.id, 
-                "name": group.name, 
+                "id": group.id,
+                "name": group.name,
                 "members": [member.username for member in group.members],
-                "owner_ids": [owner.id for owner in group.owners]
+                "owner_ids": [str(owner.id) for owner in group.owners]
             })
+
         except Exception as e:
             return jsonify({"error": str(e)}), 500
         finally:
             session.close()
+
 
     # # MEMBERS
 

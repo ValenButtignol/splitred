@@ -18,17 +18,21 @@ function GroupList() {
   const [showJoinGroupModal, setShowJoinGroupModal] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const navigate = useNavigate();
+  const userId = localStorage.getItem("user_id");
 
   useEffect(() => {
-    const userId = localStorage.getItem("user_id");
     if (!userId) return;
+  
     fetch(`http://localhost:5000/groups?owner_id=${userId}`)
       .then(res => res.json())
       .then(data => {
-        const sorted = data.sort((a: Group, b: Group) => (b.updated_at || '').localeCompare(a.updated_at || ''));
+        const sorted = data.sort((a: Group, b: Group) =>
+          (b.updated_at || '').localeCompare(a.updated_at || '')
+        );
         setGroups(sorted);
       });
   }, []);
+  
 
   const visibleGroups = showMore ? groups : groups.slice(0, 3);
 
@@ -44,7 +48,7 @@ function GroupList() {
               <button
                 key={group.id}
                 className="group-preview"
-                onClick={() => navigate(`/group/${group.id}`)}
+                onClick={() => navigate(`/groups/${group.id}?owner_id=${userId}`)}
               >
                 <h2>{group.name}</h2>
                 <div className="group-preview-members">
