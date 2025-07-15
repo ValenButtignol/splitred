@@ -2,6 +2,10 @@ import { useState } from "react";
 import "./Header.css";
 import { useNavigate } from "react-router-dom";
 import FeedbackModal from "./FeedbackModal";
+import splitredLogo from "../assets/splitred-logo.svg";
+import infoIcon from "../assets/info-icon.svg";
+import feedbackIcon from "../assets/feedback-icon.svg";;
+import donateIcon from "../assets/donate-icon.svg";;
 
 function Header() {
   const navigate = useNavigate();
@@ -11,25 +15,25 @@ function Header() {
     <header className="header">
       <button className="back-button" onClick={() => navigate("/")}>
         <h1 className="title">
-          <img src={"./src/assets/splitred-logo.svg"} alt="Splitred Logo" className="logo" />
+          <img src={splitredLogo} alt="Splitred Logo" className="logo" />
           Splitred
         </h1>
       </button>
       <div className="icons-container">
         <img
-          src={"./src/assets/donate-icon.svg"}
+          src={donateIcon}
           alt="donate-icon"
           className="donate-icon"
           onClick={() => navigate("/info")}
         />
         <img
-          src={"./src/assets/feedback-icon.svg"}
+          src={feedbackIcon}
           alt="feedback-icon"
           className="feedback-icon"
           onClick={() => setShowFeedback(true)}
         />
         <img
-          src={"./src/assets/info-icon.svg"}
+          src={infoIcon}
           alt="info-icon"
           className="info-icon"
           onClick={() => navigate("/info")}
