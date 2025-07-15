@@ -1,0 +1,264 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(20, 20, 20, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal {
+  position: relative;
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  padding: 2rem;
+  color: white;
+  width: 400px;
+  box-shadow: 0 0 20px #00000088;
+}
+
+.close-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 25%;
+  padding: 0.4rem;
+}
+
+.close-modal:hover {
+  background-color: #2e2e2e;
+}
+
+.stepper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.step:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: -50%;
+  width: 100%;
+  height: 2px;
+  background-color: #444;
+  z-index: 0;
+}
+
+.step-indicator {
+  width: 16px;
+  height: 16px;
+  background-color: #444;
+  border-radius: 50%;
+  z-index: 1;
+  margin-bottom: 0.4rem;
+}
+
+.step.active .step-indicator {
+  background-color: #e5e5e5;
+  width: 20px;
+  height: 20px;
+}
+
+.step-label {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.step.active .step-label {
+  color: #e5e5e5;
+  font-weight: bold;
+}
+
+.step-content {
+  margin-top: 2rem;
+}
+
+.modal input[type="text"],
+.modal input[type="number"] {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: #2c2c2c;
+  border: 1px solid #444;
+  color: #e5e5e5;
+  border-radius: 6px;
+}
+
+.creditor-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.creditor-select, .creditor-amount {
+  background-color: #2c2c2c;
+  color: #e5e5e5;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 0.4rem;
+  height: 33px;
+}
+
+.creditor-select {
+  flex: 1;
+}
+
+.creditor-amount {
+  margin-top: 1rem;
+  width: 100px;
+}
+
+.remove-creditor {
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border-radius: 6px;
+}
+
+.remove-creditor:hover {
+  background-color: #2e2e2e;
+}
+
+.add-creditor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #191919;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  color: #e5e5e5;
+  cursor: pointer;
+  margin: 1rem auto;
+  transition: background 0.2s ease;
+}
+
+.add-creditor:hover {
+  background-color: #2e2e2e;
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.members-list label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 14px;
+  color: #e5e5e5;
+  background-color: #2a2a2a;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.members-list label:hover {
+  background-color: #3a3a3a;
+}
+
+.members-list input[type="checkbox"] {
+  accent-color: #d3d3d3;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.modal-buttons button {
+  padding: 0.5rem 1rem;
+  background-color: #191919;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.modal-buttons button:hover {
+  background-color: #2e2e2e;
+}
+
+.summary-divider {
+  border: none;
+  height: 1px;
+  background-color: #444;
+  margin: 0.5rem 0 0.5rem 0;
+  width: 100%;
+}
+
+.summary-section {
+  margin-bottom: 1rem;
+}
+
+.summary-label {
+  font-weight: bold;
+  color: #ccc;
+  margin-bottom: 0.25rem;
+}
+
+.summary-value {
+  color: #eee;
+  margin-left: 0.5rem;
+}
+
+.summary-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.5rem;
+}
+
+.summary-list li {
+  display: flex;
+  justify-content: space-between;
+  color: #ddd;
+  padding: 0.25rem 0;
+}
+
+.creditor-summary-name {
+  font-weight: 500;
+}
+
+.creditor-summary-amount {
+  font-weight: bold;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
