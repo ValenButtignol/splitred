@@ -1,43 +1,29 @@
 .group-page {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 2rem;
-  background-color: #252525;
-  border-radius: 12px;
-  color: #d3d3d3;
-  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
 }
 
 .group-title {
-  font-size: 2rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #e5e5e5;
   margin-bottom: 1rem;
 }
 
-.group-subtitle {
-  font-size: 1.2rem;
-  color: #838383;
-  margin-top: 2rem;
-  margin-bottom: 0.5rem;
+.group-container {
+  background-color: #252525;
+  border-radius: 12px;
+  padding: 1rem;
+  width: 90%;
+  max-width: 600px;
+  margin-bottom: 3rem;
 }
 
-.group-members {
-  list-style: none;
-  padding: 0;
-}
-
-.group-member {
-  color: #aaaaaa;
-  margin: 0.25rem 0;
-}
-
-.group-error {
-  color: #ff6b6b;
-  text-align: center;
-  padding: 2rem;
-}
-
-.group-loading {
-  text-align: center;
-  padding: 2rem;
-  color: #aaaaaa;
+.group-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; 
 }
