@@ -1,9 +1,10 @@
+from click import group
 from flask import request, jsonify
 from sqlalchemy.orm import joinedload
 from domain.services import create_user, create_group, create_member, get_user_by_id, add_member_to_group, get_group_by_id
-from infrastructure.db.repository import SQLAlchemyUserRepository, SQLAlchemyGroupRepository, SQLAlchemyMemberRepository
+from infrastructure.db.repository import SQLAlchemyUserRepository, SQLAlchemyGroupRepository, SQLAlchemyMemberRepository, SQLAlchemyExpenseRepository
 from infrastructure.db import SessionLocal
-from infrastructure.db.models import UserDB, GroupDB
+from infrastructure.db.models import UserDB
 
 def register_routes(app):
 
@@ -118,13 +119,14 @@ def register_routes(app):
     @app.route("/groups/<group_id>", methods=["GET"])
     def get_group(group_id: str):
         session = SessionLocal()
+        group_repo = SQLAlchemyGroupRepository(session)
         try:
             owner_id = request.args.get("owner_id")
 
             if not owner_id:
                 return jsonify({"error": "Missing owner_id"}), 400
 
-            group = session.query(GroupDB).filter_by(id=group_id).first()
+            group = group_repo.get_group_by_owner_id(owner_id=owner_id, group_id=str(group_id))
 
             if not group:
                 return jsonify({"error": "Group not found"}), 404
@@ -146,7 +148,28 @@ def register_routes(app):
             session.close()
 
 
-    # # MEMBERS
+    # EXPENSES
+
+    @app.route("/groups/<group_id>/expenses", methods=["GET"])
+    def get_expenses(group_id: str):
+        session = SessionLocal()
+        expenses_repo = SQLAlchemyExpenseRepository(session)
+        try:
+            expenses = expenses_repo.list_by_group(group_id)
+            
+            return jsonify([{
+                "id": str(e.id),
+                "description": e.description,
+                "creditors": [{"name": c[0].username, "amount":c[1]} for c in e.creditors],
+                "debtors": [d.username for d in e.debtors],
+                "price": e.total_amount
+            } for e in expenses])
+        except Exception as e:
+            return jsonify({"error" : str(e)}), 500
+        finally:
+            session.close()
+
+    # MEMBERS
 
     # @app.route("/groups/<int:group_id>/members", methods=["POST"])
     # def post_member(group_id):
@@ -172,17 +195,14 @@ def register_routes(app):
     #     finally:
     #         session.close()
 
-    # @app.route("/groups/<int:group_id>/members", methods=["GET"])
-    # def get_members(group_id):
-    #     session = SessionLocal()
-    #     group_repo = SQLAlchemyGroupRepository(session)
-    #     try:
-    #         group = get_group_by_id(group_repo, group_id) 
-    #         return jsonify([member.username for member in group.members])
-    #     except Exception as e:
-    #         return jsonify({"error": str(e)}), 500
-    #     finally:
-    #         session.close()
-
-    # EXPENSES
-    
+    @app.route("/groups/<group_id>/members", methods=["GET"])
+    def get_members(group_id):
+        session = SessionLocal()
+        group_repo = SQLAlchemyGroupRepository(session)
+        try:
+            members = group_repo.get_members(group_id)
+            return jsonify([member.username for member in members])
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        finally:
+            session.close()

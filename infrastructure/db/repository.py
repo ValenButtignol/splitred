@@ -91,6 +91,15 @@ class SQLAlchemyGroupRepository(GroupRepository):
             members=[
                 Member(id=m.id, username=m.username, group_id=m.group_id) for m in db_group.members
             ]) for db_group in db_groups]
+    
+    def get_group_by_owner_id(self, owner_id: str, group_id: str) -> Group | None:
+        owner_groups = self.get_groups_by_owner_id(owner_id=owner_id)
+        group_uuid = UUID(group_id) 
+        for g in owner_groups:
+            if g.id == group_uuid:
+                return g
+        
+        return None
 
     def add(self, group: Group) -> None:
         db_group = GroupDB(name=group.name)
@@ -179,7 +188,8 @@ class SQLAlchemyExpenseRepository(ExpenseRepository):
         expense.id = db_expense.id
 
     def list_by_group(self, group_id: str) -> list[Expense]:
-        expenses = self.session.query(ExpenseDB).filter_by(group_id=group_id).all()
+        group_uuid = UUID(group_id)
+        expenses = self.session.query(ExpenseDB).filter_by(group_id=group_uuid).all()
         result = []
 
         for e in expenses:
