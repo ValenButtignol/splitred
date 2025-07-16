@@ -55,7 +55,7 @@
 .step:not(:first-child)::before {
   content: "";
   position: absolute;
-  top: 10px;
+  top: 6px;
   left: -50%;
   width: 100%;
   height: 2px;
@@ -64,8 +64,8 @@
 }
 
 .step-indicator {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   background-color: #444;
   border-radius: 50%;
   z-index: 1;
@@ -74,8 +74,8 @@
 
 .step.active .step-indicator {
   background-color: #e5e5e5;
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
 }
 
 .step-label {
@@ -261,4 +261,32 @@
   align-items: center;
   font-size: 1rem;
   margin-top: 0.5rem;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e5e5e5;
+}
+
+.delete-expense-button {
+  background-color: #3a1e1e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem;
+  margin-right: auto;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.delete-expense-button:hover {
+  background-color: #5e2b2b;
 }

@@ -6,6 +6,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import GroupTabs from "../components/GroupTabs";
 import ExpensesTab from "../components/ExpensesTab";
+import MembersTab from "../components/MembersTab";
 
 interface Group {
   id: string;
@@ -94,7 +95,7 @@ function GroupPage() {
           )}
 
           {!loading && activeTab === "members" && (
-            <div className="tab-placeholder">Members tab coming soon.</div>
+            <MembersTab members={members} />
           )}
 
           {!loading && activeTab === "summary" && (

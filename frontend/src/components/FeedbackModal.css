@@ -1,4 +1,4 @@
-@import "./CreateGroupModal.css"; /* Reutiliza estilos de modal base */
+@import "./CreateGroupModal.css";
 
 .feedback-textarea {
   padding: 0.8rem;

@@ -2,7 +2,7 @@
 
 import "./ExpensesTab.css";
 import { useEffect, useState } from "react";
-import AddExpenseModal from "./AddExpenseModal";
+import ExpenseModal from "./ExpenseModal";
 import plusIcon from "../assets/plus-icon.svg";
 import showMoreIcon from "../assets/show-more-icon.svg";
 import showLessIcon from "../assets/show-less-icon.svg";
@@ -25,6 +25,7 @@ function ExpensesTab({ expenses, groupId, members }: Props) {
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
   const [visibleCount, setVisibleCount] = useState(5);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [expenseToEdit, setExpenseToEdit] = useState<Expense | null>(null);
 
   // Sync local expenses when parent data changes
   useEffect(() => {
@@ -39,7 +40,7 @@ function ExpensesTab({ expenses, groupId, members }: Props) {
   }) => {
     const newExpense: Expense = {
       ...expense,
-      id: crypto.randomUUID(), // temporal
+      id: "1"   // TODO: AGREGAR LÓGICA PARA ESTA BOSTA.
     };
     setAllExpenses((prev) => [...prev, newExpense]);
   };
@@ -48,33 +49,44 @@ function ExpensesTab({ expenses, groupId, members }: Props) {
 
   return (
     <div className="expenses-container">
-      <table className="expenses-table">
-        <thead>
-          <tr>
-            <th style={{ textAlign: "center" }}>Description</th>
-            <th style={{ textAlign: "center" }}>Creditors</th>
-            <th style={{ textAlign: "center" }}>Consumers</th>
-            <th style={{ textAlign: "center" }}>Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {visibleExpenses.map((expense) => (
-            <tr key={expense.id} className="expense-row">
-              <td>{expense.description}</td>
-              <td>
-                {expense.creditors.map((c) => (
-                  <div key={`${expense.id}-${c.name}`}>
-                    {c.name}: ${c.amount}
-                  </div>
-                ))}
-              </td>
-              <td>{expense.debtors.join(", ")}</td>
-              <td>${expense.price.toFixed(2)}</td>
+      {allExpenses.length === 0 ? (
+        <div className="no-expenses-message">
+          Looks like there are no expenses yet, press the button below to add one
+        </div>
+      ) : (
+        <table className="expenses-table">
+          <thead>
+            <tr>
+              <th style={{ textAlign: "center" }}>Description</th>
+              <th style={{ textAlign: "center" }}>Creditors</th>
+              <th style={{ textAlign: "center" }}>Consumers</th>
+              <th style={{ textAlign: "center" }}>Price</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-
+          </thead>
+          <tbody>
+            {visibleExpenses.map((expense) => (
+              <tr
+                key={expense.id}
+                className="expense-row"
+                onClick={() => setExpenseToEdit(expense)}
+                style={{ cursor: "pointer" }}
+              >
+                <td>{expense.description}</td>
+                <td>
+                  {expense.creditors.map((c) => (
+                    <div key={`${expense.id}-${c.name}`}>
+                      {c.name}: ${c.amount}
+                    </div>
+                  ))}
+                </td>
+                <td>{expense.debtors.join(", ")}</td>
+                <td>${expense.price.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+  
       <div className="expenses-buttons">
         {allExpenses.length > 5 && (
           <button
@@ -94,7 +106,7 @@ function ExpensesTab({ expenses, groupId, members }: Props) {
             />
           </button>
         )}
-
+  
         <button className="circle-button" onClick={() => setShowExpenseModal(true)}>
           <img
             src={plusIcon}
@@ -105,17 +117,33 @@ function ExpensesTab({ expenses, groupId, members }: Props) {
           />
         </button>
       </div>
-
+  
       {showExpenseModal && (
-        <AddExpenseModal
+        <ExpenseModal
           onClose={() => setShowExpenseModal(false)}
           onSubmit={handleAddExpense}
           members={members}
           groupId={groupId}
         />
       )}
+      {expenseToEdit && (
+        <ExpenseModal
+          onClose={() => setExpenseToEdit(null)}
+          onSubmit={(updated) => {
+            const updatedList = allExpenses.map((exp) =>
+              exp.id === expenseToEdit.id ? { ...exp, ...updated } : exp
+            );
+            setAllExpenses(updatedList);
+            setExpenseToEdit(null);
+          }}
+          members={members}
+          groupId={groupId}
+          editMode={true}
+          initialExpense={expenseToEdit}
+        />
+      )}
     </div>
-  );
+  );  
 }
 
 export default ExpensesTab;

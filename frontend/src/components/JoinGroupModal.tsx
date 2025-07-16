@@ -14,7 +14,7 @@ export default function JoinGroupModal({ onClose }: Props) {
     e.preventDefault();
     if (invitationLink.trim() === "") return;
 
-    // Acá podrías hacer un POST al backend y obtener un ID real
+    // TODO: Acá podrías hacer un POST al backend y obtener un ID real
     const fakeGroupId = encodeURIComponent(invitationLink.trim());
 
     navigate(`/group/${fakeGroupId}`);
