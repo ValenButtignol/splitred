@@ -21,10 +21,16 @@ class GroupRepository(ABC):
     def get_by_id(self, group_id: str) -> Group: pass
 
     @abstractmethod
+    def get_groups_by_owner_id(self, owner_id:str) -> list[Group]: pass
+
+    @abstractmethod
     def add(self, group: Group) -> None: pass
 
     @abstractmethod
     def add_member(self, group_id: str, member: Member) -> None: pass
+
+    @abstractmethod
+    def update_member_name(self, group_id: str, old_name: str, new_name: str) -> None: pass
 
     @abstractmethod
     def get_members(self, group_id: str) -> list[Member]: pass

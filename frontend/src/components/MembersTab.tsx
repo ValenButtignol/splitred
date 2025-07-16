@@ -6,60 +6,107 @@ import deleteIcon from "../assets/delete-icon.svg";
 import showMoreIcon from "../assets/show-more-icon.svg"
 import showLessIcon from "../assets/show-less-icon.svg"
 import EditMemberModal from "./EditMemberModal";
+import { API_URL } from "../lib/constants";
+import ConfirmDeleteMember from "./ConfirmDeleteMember";
 
 interface Props {
+  groupId: string;
   members: string[];
-  expenses: {
-    creditors: { name: string }[];
-    debtors: string[];
-  }[];
   onUpdate?: (updated: string[]) => void;
 }
 
-// TODO: Terminar backend de esto.
-function MembersTab({ members, expenses, onUpdate }: Props) {
+function MembersTab({ groupId, members, onUpdate }: Props) {
   const [editableMembers, setEditableMembers] = useState(members);
   const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showMore, setShowMore] = useState(false);
   const [error, setError] = useState("");
+  const [deleteModalIndex, setDeleteModalIndex] = useState<number | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [modalError, setModalError] = useState("");
+
+  const confirmDelete = async (index: number) => {
+    const member = editableMembers[index];
+    try {
+      const res = await fetch(`${API_URL}/groups/${groupId}/members/${member}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setDeleteError(data.error || "Failed to delete member");
+        return;
+      }
+  
+      const updated = editableMembers.filter((_, i) => i !== index);
+      setEditableMembers(updated);
+      onUpdate?.(updated);
+      setDeleteModalIndex(null);
+      setDeleteError(null);
+    } catch {
+      setDeleteError("Network error");
+    }
+  };
 
   const visibleMembers = showMore ? editableMembers : editableMembers.slice(0, 5);
 
-  const handleSaveMember = (name: string) => {
+  const handleSaveMember = async (name: string) => {
     if (modalMode === "add") {
-      const updated = [...editableMembers, name];
-      setEditableMembers(updated);
-      onUpdate?.(updated);
+      try {
+        const res = await fetch(`${API_URL}/groups/${groupId}/members`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username: name }),
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Failed to add member.");
+        }
+
+        const data = await res.json();
+        const updated = [...editableMembers, data.member_username];
+        setEditableMembers(updated);
+        onUpdate?.(updated);
+      } catch (err) {
+        setError((err as Error).message);
+        setTimeout(() => setError(""), 4000);
+      }
     } else if (modalMode === "edit" && selectedIndex !== null) {
-      const updated = [...editableMembers];
-      updated[selectedIndex] = name;
-      setEditableMembers(updated);
-      onUpdate?.(updated);
+      const oldName = editableMembers[selectedIndex];
+
+      fetch(`${API_URL}/groups/${groupId}/members/${oldName}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ new_name: name }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) {
+            setModalError(data.error);
+          } else {
+            const updated = [...editableMembers];
+            updated[selectedIndex] = name;
+            setEditableMembers(updated);
+            onUpdate?.(updated);
+            closeModal();
+          }
+        })
+        .catch(() => {
+          setModalError("Failed to update member name");
+        });
     }
 
     closeModal();
   };
 
   const handleDelete = (index: number) => {
-    const name = editableMembers[index];
-    const used = expenses.some(
-      (exp) =>
-        exp.creditors.some((c) => c.name === name) ||
-        exp.debtors.includes(name)
-    );
-    if (used) {
-      setError(
-        "This member cannot be deleted because they are involved in at least one expense."
-      );
-      setTimeout(() => setError(""), 4000);
-      return;
-    }
-
-    const updated = editableMembers.filter((_, i) => i !== index);
-    setEditableMembers(updated);
-    onUpdate?.(updated);
-  };
+    setDeleteModalIndex(index);
+    setDeleteError(null); // limpiamos cualquier error previo
+  };  
 
   const closeModal = () => {
     setModalMode(null);
@@ -126,6 +173,21 @@ function MembersTab({ members, expenses, onUpdate }: Props) {
           onSave={handleSaveMember}
         />
       )}
+
+      {deleteModalIndex !== null && (
+        <ConfirmDeleteMember
+          memberName={editableMembers[deleteModalIndex]}
+          onConfirm={() => confirmDelete(deleteModalIndex)}
+          onCancel={() => {
+            setDeleteModalIndex(null);
+            setDeleteError(null);
+          }}
+          error={deleteError || undefined}
+        />
+      )}
+
+      {modalError && <p className="text-red-500 text-sm mt-2">{modalError}</p>}
+
     </div>
   );
 }

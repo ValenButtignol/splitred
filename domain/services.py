@@ -1,4 +1,5 @@
 # Use Cases
+from turtle import up
 from click import group
 from domain.models import User, Group, Expense, Member
 from application.ports import UserRepository, GroupRepository, ExpenseRepository, MemberRepository
@@ -29,6 +30,27 @@ def get_member_by_id(member_repo: MemberRepository, member_id: int, group_id: st
         raise ValueError("Member not found")
     return member
 
+def get_member_by_username_and_group(group_repo: GroupRepository, member_username: str, group_id: str) -> Member | None:
+    group_members = group_repo.get_members(group_id)
+    for m in group_members:
+        if m.username == member_username:
+            return m
+    return None
+
+def edit_member_name_in_group(group_repo: GroupRepository, group_id: str, old_name: str, new_name: str):
+    group = get_group_by_id(group_repo, group_id)
+    updatable = False
+    for m in group.members:
+        if old_name == m.username:
+            updatable = True
+        if new_name == m.username:
+            raise ValueError("A member with the new name already exists in the group")
+
+    if updatable:
+        group_repo.update_member_name(group_id, old_name, new_name)
+    else:
+        raise ValueError("Member not found")
+
 # GROUPS
 
 def get_group_by_id(group_repo: GroupRepository, group_id: str) -> Group:
@@ -36,6 +58,12 @@ def get_group_by_id(group_repo: GroupRepository, group_id: str) -> Group:
     if not group:
         raise ValueError("Group not found")
     return group
+
+def get_groups_by_owner_id(group_repo: GroupRepository, owner_id: str | None) -> list[Group]:
+    if owner_id:
+        groups = group_repo.get_groups_by_owner_id(owner_id)
+        return groups
+    return []
 
 def create_group(group_repo: GroupRepository, name: str, owner: User) -> Group:
     group = Group(id="", name=name, owners=[owner])
@@ -51,7 +79,13 @@ def add_owner_to_group(group_repo: GroupRepository, group_id: str, owner: User):
 
 def add_member_to_group(group_repo: GroupRepository, group_id: str, member: Member):
     group = get_group_by_id(group_repo, group_id)
+    for m in group.members:
+        if member.username == m.username:
+            raise ValueError("Member is already in the group")
     group_repo.add_member(group_id, member)
+
+def get_members_by_group_id(group_repo: GroupRepository, group_id: str) -> list[Member]:
+    return group_repo.get_members(group_id)
 
 def remove_member_from_group(group_repo: GroupRepository, expense_repo: ExpenseRepository, group_id: str, member: Member):
     group = get_group_by_id(group_repo, group_id)
@@ -68,6 +102,9 @@ def remove_member_from_group(group_repo: GroupRepository, expense_repo: ExpenseR
 
 # EXPENSES
 from domain.models import Expense
+
+def get_expenses_by_group_id(expenses_repo: ExpenseRepository, group_id: str) -> list[Expense]:
+    return expenses_repo.list_by_group(group_id)
 
 def create_expense(
     expense_repo: ExpenseRepository,

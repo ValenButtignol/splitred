@@ -35,6 +35,14 @@ function GroupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const fetchMembers = async (groupId: string): Promise<string[]> => {
+    const res = await fetch(`${API_URL}/groups/${groupId}/members`);
+    if (!res.ok) throw new Error("Failed to fetch members");
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    return data;
+  };
+
   // Fetch main group info once
   useEffect(() => {
     if (!group_id || !owner_id) return;
@@ -70,8 +78,10 @@ function GroupPage() {
 
     // Add future tab fetches here
     if (activeTab === "members") {
-      // Aquí podrías fetch con más detalle si hiciera falta
-      setLoading(false); // Simulación
+      fetchMembers(group_id)
+        .then((data) => setMembers(data))
+        .catch(() => setError("Failed to load members"))
+        .finally(() => setLoading(false));
     }
 
   }, [activeTab, group_id]);
@@ -95,7 +105,7 @@ function GroupPage() {
           )}
 
           {!loading && activeTab === "members" && (
-            <MembersTab members={members} />
+            <MembersTab groupId={group_id!} members={members} />
           )}
 
           {!loading && activeTab === "summary" && (

@@ -91,15 +91,6 @@ class SQLAlchemyGroupRepository(GroupRepository):
             members=[
                 Member(id=m.id, username=m.username, group_id=m.group_id) for m in db_group.members
             ]) for db_group in db_groups]
-    
-    def get_group_by_owner_id(self, owner_id: str, group_id: str) -> Group | None:
-        owner_groups = self.get_groups_by_owner_id(owner_id=owner_id)
-        group_uuid = UUID(group_id) 
-        for g in owner_groups:
-            if g.id == group_uuid:
-                return g
-        
-        return None
 
     def add(self, group: Group) -> None:
         db_group = GroupDB(name=group.name)
@@ -113,6 +104,19 @@ class SQLAlchemyGroupRepository(GroupRepository):
         self.session.add(db_member)
         self.session.commit()
         member.id = db_member.id
+
+    def update_member_name(self, group_id: str, old_name: str, new_name: str) -> None:
+        group_uuid = UUID(group_id)
+
+        db_member = (
+            self.session.query(MemberDB)
+            .filter_by(group_id=group_uuid, username=old_name)
+            .first()
+        )
+
+        if db_member:
+            db_member.username = new_name
+            self.session.commit()
 
     def get_members(self, group_id: str) -> list[Member]:
         group_uuid = UUID(group_id)  # Convert string to UUID instance
