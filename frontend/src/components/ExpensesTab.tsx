@@ -6,6 +6,7 @@ import ExpenseModal from "./ExpenseModal";
 import plusIcon from "../assets/plus-icon.svg";
 import showMoreIcon from "../assets/show-more-icon.svg";
 import showLessIcon from "../assets/show-less-icon.svg";
+import { API_URL } from "../lib/constants";
 
 interface Expense {
   id: string;
@@ -32,18 +33,92 @@ function ExpensesTab({ expenses, groupId, members }: Props) {
     setAllExpenses(expenses);
   }, [expenses]);
 
-  const handleAddExpense = (expense: {
+  const handleAddExpense = async (expense: {
     description: string;
     price: number;
     creditors: { name: string; amount: number }[];
     debtors: string[];
   }) => {
-    const newExpense: Expense = {
-      ...expense,
-      id: "1"   // TODO: AGREGAR LÓGICA PARA ESTA BOSTA.
-    };
-    setAllExpenses((prev) => [...prev, newExpense]);
+    try {
+      const res = await fetch(`${API_URL}/groups/${groupId}/expenses`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(expense),
+      });
+      
+      console.log(res);
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to create expense");
+      }
+  
+      const newExpense = await res.json();
+      setAllExpenses((prev) => [...prev, newExpense]);
+    } catch (error) {
+      console.error("Error adding expense:", error);
+      alert(`Error: ${(error as Error).message}`);
+    }
+  };  
+
+  const handleEditExpense = async (updatedExpense: {
+    id: string;
+    description: string;
+    price: number;
+    creditors: { name: string; amount: number }[];
+    debtors: string[];
+  }) => {
+    try {
+      const res = await fetch(
+        `${API_URL}/expenses/${updatedExpense.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            description: updatedExpense.description,
+            price: updatedExpense.price,
+            creditors: updatedExpense.creditors,
+            debtors: updatedExpense.debtors,
+          }),
+        }
+      );
+  
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to update expense");
+      }
+  
+      const updated = await res.json();
+  
+      setAllExpenses((prev) =>
+        prev.map((exp) => (exp.id === updated.id ? updated : exp))
+      );
+      setExpenseToEdit(null);
+    } catch (error) {
+      console.error("Error updating expense:", error);
+      alert(`Error: ${(error as Error).message}`);
+    }
   };
+
+  const handleDeleteExpense = async (expenseId: string) => {
+    try {
+      const res = await fetch(`${API_URL}/expenses/${expenseId}`, {
+        method: "DELETE",
+      });
+  
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to delete expense");
+      }
+  
+      setAllExpenses((prev) => prev.filter((e) => e.id !== expenseId));
+      setExpenseToEdit(null);
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      alert(`Error: ${(error as Error).message}`);
+    }
+  };
+  
 
   const visibleExpenses = allExpenses.slice(0, visibleCount);
 
@@ -129,19 +204,17 @@ function ExpensesTab({ expenses, groupId, members }: Props) {
       {expenseToEdit && (
         <ExpenseModal
           onClose={() => setExpenseToEdit(null)}
-          onSubmit={(updated) => {
-            const updatedList = allExpenses.map((exp) =>
-              exp.id === expenseToEdit.id ? { ...exp, ...updated } : exp
-            );
-            setAllExpenses(updatedList);
-            setExpenseToEdit(null);
-          }}
+          onSubmit={(updated) =>
+            handleEditExpense({ ...updated, id: expenseToEdit.id })
+          }
+          onDelete={() => handleDeleteExpense(expenseToEdit.id)}
           members={members}
           groupId={groupId}
           editMode={true}
           initialExpense={expenseToEdit}
         />
       )}
+
     </div>
   );  
 }

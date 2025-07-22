@@ -16,6 +16,7 @@ interface Props {
     creditors: { name: string; amount: number }[];
     debtors: string[];
   }) => void;
+  onDelete?: () => void;
   groupId: string;
   members: string[];
   editMode?: boolean;
@@ -26,12 +27,26 @@ interface Props {
   };
 }
 
-function ExpenseModal({ onClose, onSubmit, groupId, members, editMode, initialExpense }: Props) {
+
+function ExpenseModal({ onClose, onSubmit, onDelete, groupId, members, editMode, initialExpense }: Props) {
   const [step, setStep] = useState(1);
   const [description, setDescription] = useState(initialExpense?.description || "");
   const [creditors, setCreditors] = useState(initialExpense?.creditors || [{ name: "", amount: 0 }]);
   const [debtors, setDebtors] = useState(initialExpense?.debtors || []);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  const handleDelete = () => {
+    setShowDeleteConfirm(true);
+  }
 
+  const confirmDelete = () => {
+    if (onDelete) onDelete();
+    onClose();
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+  };
 
   const toggleDebtor = (name: string) => {
     setDebtors((prev) =>
@@ -48,10 +63,6 @@ function ExpenseModal({ onClose, onSubmit, groupId, members, editMode, initialEx
     onSubmit({ description, price: total, creditors, debtors });
     onClose();
   };
-
-  const handleDelete = () => {
-    return;
-  }
 
   return (
     <div className="modal-overlay">
@@ -257,7 +268,15 @@ function ExpenseModal({ onClose, onSubmit, groupId, members, editMode, initialEx
           </div>
         </div>
       )}
-
+      {showDeleteConfirm && (
+        <div className="delete-confirmation">
+          <p>Are you sure you want to delete this expense?</p>
+          <div className="confirmation-buttons">
+            <button onClick={confirmDelete}>Yes</button>
+            <button onClick={cancelDelete}>No</button>
+          </div>
+        </div>
+      )}
     </div>
   </div>
   );

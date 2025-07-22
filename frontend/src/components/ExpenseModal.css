@@ -290,3 +290,26 @@
 .delete-expense-button:hover {
   background-color: #5e2b2b;
 }
+
+.delete-confirmation {
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.confirmation-buttons button {
+  margin: 0 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #191919;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.confirmation-buttons :hover {
+  background-color: #2e2e2e;
+}
