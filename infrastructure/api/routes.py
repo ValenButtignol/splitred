@@ -1,5 +1,5 @@
 from flask import request, jsonify, session
-from domain.services import create_user, create_group, create_member, edit_member_name_in_group, get_expenses_by_group_id, get_groups_by_owner_id, get_member_by_id, get_member_by_username_and_group, get_members_by_group_id, get_user_by_id, add_member_to_group, get_group_by_id, remove_member_from_group
+from domain.services import create_expense, create_user, create_group, create_member, edit_member_name_in_group, get_expenses_by_group_id, get_groups_by_owner_id, get_member_by_id, get_member_by_username_and_group, get_members_by_group_id, get_user_by_id, add_member_to_group, get_group_by_id, remove_expense, remove_member_from_group, update_expense
 from infrastructure.db.repository import SQLAlchemyUserRepository, SQLAlchemyGroupRepository, SQLAlchemyMemberRepository, SQLAlchemyExpenseRepository
 from infrastructure.db import SessionLocal
 from infrastructure.db.models import UserDB
@@ -150,6 +150,71 @@ def register_routes(app):
         finally:
             session.close()
 
+    @app.route("/groups/<group_id>/expenses", methods=["POST"])
+    def post_expense(group_id: str):
+        session = SessionLocal()
+        expense_repo = SQLAlchemyExpenseRepository(session)
+        group_repo = SQLAlchemyGroupRepository(session)
+
+        try:
+            data = request.get_json()
+            description = data["description"]
+            price = data["price"]
+            creditors = data["creditors"]  # [{name, amount}]
+            debtors = data["debtors"]      # [name]
+
+            expense = create_expense(
+                expense_repo, group_repo, group_id,
+                description, price, creditors, debtors
+            )
+
+            return jsonify({
+                "id": str(expense.id),
+                "description": expense.description,
+                "creditors": [{"name": c[0].username, "amount": c[1]} for c in expense.creditors],
+                "debtors": [d.username for d in expense.debtors],
+                "price": expense.total_amount
+            }), 201
+
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        finally:
+            session.close()
+
+    @app.route("/expenses/<expense_id>", methods=["PUT"])   # This should depend of the group_id
+    def update_expense_endpoint(expense_id: str):
+        session = SessionLocal()
+        expense_repo = SQLAlchemyExpenseRepository(session)
+        group_repo = SQLAlchemyGroupRepository(session)
+
+        try:
+            data = request.get_json()
+            description = data["description"]
+            price = data["price"]
+            creditors = data["creditors"]
+            debtors = data["debtors"]
+
+            update_expense(
+                expense_repo,
+                group_repo,
+                expense_id,
+                description,
+                price,
+                creditors,
+                debtors
+            )
+
+            return jsonify({"message": "Expense updated"}), 200
+
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        finally:
+            session.close()
+
     # MEMBERS
 
     @app.route("/groups/<group_id>/members", methods=["POST"])
@@ -194,7 +259,6 @@ def register_routes(app):
                 return jsonify({"error": "Member not found"}), 404
 
             remove_member_from_group(group_repo, expense_repo, group_id, member)
-            session.commit()
             return jsonify({"message": "Member removed"}), 200
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
@@ -217,3 +281,18 @@ def register_routes(app):
             return jsonify({"success": True}), 200
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
+
+    @app.route("/expenses/<expense_id>", methods=["DELETE"])
+    def delete_expense(expense_id):
+        session = SessionLocal()
+        expense_repo = SQLAlchemyExpenseRepository(session)
+        try:
+            remove_expense(expense_repo, expense_id)
+            
+            return jsonify({"message": "Member removed"}), 200
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        finally:
+            session.close()

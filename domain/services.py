@@ -1,6 +1,4 @@
 # Use Cases
-from turtle import up
-from click import group
 from domain.models import User, Group, Expense, Member
 from application.ports import UserRepository, GroupRepository, ExpenseRepository, MemberRepository
 
@@ -101,7 +99,6 @@ def remove_member_from_group(group_repo: GroupRepository, expense_repo: ExpenseR
 
 
 # EXPENSES
-from domain.models import Expense
 
 def get_expenses_by_group_id(expenses_repo: ExpenseRepository, group_id: str) -> list[Expense]:
     return expenses_repo.list_by_group(group_id)
@@ -112,26 +109,63 @@ def create_expense(
     group_id: str,
     description: str,
     total_amount: float,
-    creditor_shares: list[tuple[Member, float]],
-    debtor_shares: list[Member],
+    creditors: list[dict],  # [{name: str, amount: float}]
+    debtors: list[str]
 ) -> Expense:
-    group = get_group_by_id(group_repo, group_id)
+    group = group_repo.get_by_id(group_id)
     if not group:
         raise ValueError("Group not found")
 
-    if sum(share for _, share in creditor_shares) != total_amount:
-        raise ValueError("Total amount of creditors does not match the total amount of the expense")
+    creditor_members, debtor_members = _map_and_validate_members(
+        group,
+        creditors,
+        debtors
+    )
 
     expense = Expense(
         id=0,
         description=description,
         total_amount=total_amount,
         group_id=group_id,
-        creditors=creditor_shares,
-        debtors=debtor_shares,
+        creditors=creditor_members,
+        debtors=debtor_members
     )
     expense_repo.add(expense)
     return expense
+
+def update_expense(
+    expense_repo: ExpenseRepository,
+    group_repo: GroupRepository,
+    expense_id: str,
+    description: str,
+    total_amount: float,
+    creditors: list[dict],
+    debtors: list[str]
+):
+    expense = expense_repo.get_by_id(expense_id)
+    if not expense:
+        raise ValueError("Expense not found")
+
+    group = group_repo.get_by_expense_id(expense_id)
+    if not group:
+        raise ValueError("Group not found for expense")
+
+    creditor_members, debtor_members = _map_and_validate_members(
+        group,
+        creditors,
+        debtors
+    )
+
+    # Update expense
+    expense.description = description
+    expense.total_amount = total_amount
+    expense.creditors = creditor_members
+    expense.debtors = debtor_members
+
+    expense_repo.update(expense)
+
+def remove_expense(expense_repo: ExpenseRepository, expense_id: str):
+    expense_repo.remove(expense_id)
 
 def calculate_group_balance(
     expense_repo: ExpenseRepository,
@@ -185,3 +219,26 @@ def _insert_ordered(lst: list[tuple[Member, float]], item: tuple[Member, float])
             lst.insert(i, item)
             return
     lst.append(item)
+
+def _map_and_validate_members(
+    group: Group,
+    creditors_data: list[dict],
+    debtor_names: list[str]
+) -> tuple[list[tuple[Member, float]], list[Member]]:
+    name_to_member = {m.username: m for m in group.members}
+
+    creditor_members = []
+    for c in creditors_data:
+        name = c["name"]
+        amount = c["amount"]
+        if name not in name_to_member:
+            raise ValueError(f"Creditor '{name}' not in group")
+        creditor_members.append((name_to_member[name], amount))
+
+    debtor_members = []
+    for name in debtor_names:
+        if name not in name_to_member:
+            raise ValueError(f"Debtor '{name}' not in group")
+        debtor_members.append(name_to_member[name])
+
+    return creditor_members, debtor_members

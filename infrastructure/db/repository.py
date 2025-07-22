@@ -1,6 +1,8 @@
 # SQLAlchemy Implementations of Repository Interfaces
 
 from uuid import UUID
+
+from flask import session
 from application.ports import UserRepository, GroupRepository, ExpenseRepository, MemberRepository
 from domain.models import User, Group, Expense, Member
 from infrastructure.db.models import (
@@ -92,6 +94,19 @@ class SQLAlchemyGroupRepository(GroupRepository):
                 Member(id=m.id, username=m.username, group_id=m.group_id) for m in db_group.members
             ]) for db_group in db_groups]
 
+    def get_by_expense_id(self, expense_id:str) -> Group | None:
+        db_expense = self.session.query(ExpenseDB).filter_by(id=expense_id).first()
+        db_group = self.session.query(GroupDB).filter_by(id=db_expense.group_id).first()
+        if not db_group:
+            return 
+        return Group(
+            id=db_group.id,
+            name=db_group.name,
+            owners=[User(id=gp.user_id) for gp in db_group.owners],
+            members=[
+                Member(id=m.id, username=m.username, group_id=m.group_id) for m in db_group.members
+            ])
+
     def add(self, group: Group) -> None:
         db_group = GroupDB(name=group.name)
         self.session.add(db_group)
@@ -164,11 +179,22 @@ class SQLAlchemyExpenseRepository(ExpenseRepository):
     def __init__(self, session):
         self.session = session
 
+    def get_by_id(self, expense_id: str) -> Expense | None:
+        db_expense = self.session.query(ExpenseDB).filter_by(id=expense_id).first()
+        if not db_expense:
+            return
+        return Expense(
+            id=db_expense.id,
+            description=db_expense.description,
+            total_amount=db_expense.total_amount,
+            group_id=db_expense.group_id,
+        )
+
     def add(self, expense: Expense) -> None:
         db_expense = ExpenseDB(
             description=expense.description,
             total_amount=expense.total_amount,
-            group_id=expense.group_id,
+            group_id=UUID(expense.group_id),
         )
         self.session.add(db_expense)
         self.session.flush()  # obtain db_expense.id
@@ -190,6 +216,42 @@ class SQLAlchemyExpenseRepository(ExpenseRepository):
 
         self.session.commit()
         expense.id = db_expense.id
+
+    def update(self, expense: Expense) -> None:
+        db_expense = self.session.query(ExpenseDB).filter_by(id=expense.id).first()
+        if not db_expense:
+            raise ValueError("Expense not found")
+
+        # Update simple fields
+        db_expense.description = expense.description
+        db_expense.total_amount = expense.total_amount
+
+        # Delete previous related data
+        self.session.query(ExpenseDebtorDB).filter_by(expense_id=expense.id).delete()
+        self.session.query(ExpenseCreditorDB).filter_by(expense_id=expense.id).delete()
+
+        # Add new debtors and creditors
+        for debtor in expense.debtors:
+            self.session.add(ExpenseDebtorDB(
+                expense_id=expense.id,
+                member_id=debtor.id
+            ))
+
+        for member, amount in expense.creditors:
+            self.session.add(ExpenseCreditorDB(
+                expense_id=expense.id,
+                member_id=member.id,
+                amount=amount
+            ))
+
+        self.session.commit()
+
+    def remove(self, expense_id: str) -> None:
+        db_expense = self.session.query(ExpenseDB).filter_by(id=expense_id).first()
+        if db_expense:
+            self.session.delete(db_expense)
+            self.session.commit()
+
 
     def list_by_group(self, group_id: str) -> list[Expense]:
         group_uuid = UUID(group_id)

@@ -44,10 +44,21 @@ class GroupRepository(ABC):
     @abstractmethod
     def get_owners(self, group_id: str) -> list[User]: pass
 
+    @abstractmethod
+    def get_by_expense_id(self, expense_id: str) -> list[Expense]: pass
 
 class ExpenseRepository(ABC):
     @abstractmethod
+    def get_by_id(self, expense_id: str) -> Expense | None: pass
+
+    @abstractmethod
     def add(self, expense: Expense) -> None: pass
+
+    @abstractmethod
+    def update(self, expense: Expense) -> None: pass
+
+    @abstractmethod
+    def remove(self, expense_id: str) -> None: pass
 
     @abstractmethod
     def list_by_group(self, group_id: str) -> list[Expense]: pass
