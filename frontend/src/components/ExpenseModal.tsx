@@ -225,8 +225,6 @@ function ExpenseModal({ onClose, onSubmit, onDelete, groupId, members, editMode,
         <div className="step-content">
           <h2>{description}</h2>
           <hr className="summary-divider" />
-
-
           <div className="summary-section">
             <p className="summary-label">Creditors</p>
             <ul className="summary-list">

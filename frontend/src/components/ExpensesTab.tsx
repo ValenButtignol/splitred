@@ -132,7 +132,7 @@ function ExpensesTab({ expenses, groupId, members }: Props) {
         <table className="expenses-table">
           <thead>
             <tr>
-              <th style={{ textAlign: "center" }}>Description</th>
+              <th style={{ textAlign: "center", width:"30%" }}>Description</th>
               <th style={{ textAlign: "center" }}>Creditors</th>
               <th style={{ textAlign: "center" }}>Consumers</th>
               <th style={{ textAlign: "center" }}>Price</th>
@@ -146,7 +146,13 @@ function ExpensesTab({ expenses, groupId, members }: Props) {
                 onClick={() => setExpenseToEdit(expense)}
                 style={{ cursor: "pointer" }}
               >
-                <td>{expense.description}</td>
+                <td style={{ wordBreak: "break-word", overflowWrap: "break-word" }}>
+                  {
+                    expense.description.length > 30 ? 
+                    expense.description.slice(0, 30) + "..." : 
+                    expense.description
+                  }
+                </td>
                 <td>
                   {expense.creditors.map((c) => (
                     <div key={`${expense.id}-${c.name}`}>

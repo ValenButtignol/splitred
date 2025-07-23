@@ -18,7 +18,7 @@
   color: #838383;
   font-size: 16px;
   font-weight: normal;
-  text-align: center; /* centramos los headers */
+  text-align: center;
   padding: 0.75rem;
 }
 
@@ -27,7 +27,7 @@
   color: #e5e5e5;
   font-size: 12px;
   padding: 0.5rem 0.75rem;
-  text-align: left; /* mantenemos alineación izquierda en datos */
+  text-align: left;
 }
 
 .expense-row {

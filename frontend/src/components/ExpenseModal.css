@@ -92,6 +92,13 @@
   margin-top: 2rem;
 }
 
+.step-content h2 {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  white-space: normal;
+}
+
 .modal input[type="text"],
 .modal input[type="number"] {
   width: 100%;
@@ -220,6 +227,7 @@
 }
 
 .summary-section {
+  text-align: left;
   margin-bottom: 1rem;
 }
 
