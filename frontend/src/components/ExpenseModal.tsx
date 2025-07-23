@@ -272,8 +272,8 @@ function ExpenseModal({ onClose, onSubmit, onDelete, groupId, members, editMode,
         <div className="delete-confirmation">
           <p>Are you sure you want to delete this expense?</p>
           <div className="confirmation-buttons">
-            <button onClick={confirmDelete}>Yes</button>
             <button onClick={cancelDelete}>No</button>
+            <button onClick={confirmDelete}>Yes</button>
           </div>
         </div>
       )}

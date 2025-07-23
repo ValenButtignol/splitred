@@ -1,5 +1,5 @@
 from flask import request, jsonify, session
-from domain.services import create_expense, create_user, create_group, create_member, edit_member_name_in_group, get_expenses_by_group_id, get_groups_by_owner_id, get_member_by_id, get_member_by_username_and_group, get_members_by_group_id, get_user_by_id, add_member_to_group, get_group_by_id, remove_expense, remove_member_from_group, update_expense
+from domain.services import calculate_group_balance, calculate_payments, create_expense, create_user, create_group, create_member, edit_member_name_in_group, get_expenses_by_group_id, get_groups_by_owner_id, get_member_by_id, get_member_by_username_and_group, get_members_by_group_id, get_user_by_id, add_member_to_group, get_group_by_id, remove_expense, remove_member_from_group, update_expense
 from infrastructure.db.repository import SQLAlchemyUserRepository, SQLAlchemyGroupRepository, SQLAlchemyMemberRepository, SQLAlchemyExpenseRepository
 from infrastructure.db import SessionLocal
 from infrastructure.db.models import UserDB
@@ -296,3 +296,33 @@ def register_routes(app):
             return jsonify({"error": str(e)}), 500
         finally:
             session.close()
+
+    # SUMMARY
+
+    @app.route("/groups/<group_id>/summary", methods=["GET"])
+    def get_group_summary(group_id):
+        session = SessionLocal()
+        expense_repo = SQLAlchemyExpenseRepository(session)
+        group_repo = SQLAlchemyGroupRepository(session)
+        try:
+            balances = calculate_group_balance(expense_repo, group_repo, group_id)
+            payments = calculate_payments(balances)
+
+            response = {
+                "balances": {
+                    member.username: round(balance, 2)
+                    for member, balance in balances.items()
+                },
+                "payments": [
+                    {
+                        "from": debtor.username,
+                        "to": creditor.username,
+                        "amount": round(amount, 2),
+                    }
+                    for creditor, debtor, amount in payments
+                ],
+            }
+            return jsonify(response), 200
+        except Exception as e:
+            print(f"Error in /groups/{group_id}/summary: {e}")
+            return jsonify({"error": str(e)}), 500

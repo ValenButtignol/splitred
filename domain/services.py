@@ -91,8 +91,9 @@ def remove_member_from_group(group_repo: GroupRepository, expense_repo: ExpenseR
         raise ValueError("Member is not in the group")
     expenses = expense_repo.list_by_group(group_id)
     for expense in expenses:
-        if member in expense.creditors:
-            raise ValueError("Member is in an expense of the group")
+        for creditor, amount in expense.creditors:
+            if member is creditor:
+                raise ValueError("Member is in an expense of the group")
         if member in expense.debtors:
             raise ValueError("Member is in an expense of the group")
     group_repo.remove_member(group_id, member)

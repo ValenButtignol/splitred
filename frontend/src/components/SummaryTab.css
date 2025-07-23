@@ -1,0 +1,39 @@
+.summary-tab {
+  padding: 1.5rem;
+  color: #f1f1f1;
+  font-family: sans-serif;
+}
+
+.summary-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1.2rem;
+  color: #ffffff;
+}
+
+.creditor-block {
+  padding: 1rem;
+  border-top: 1px solid #333;
+}
+
+.creditor-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.6rem;
+}
+
+.debtor-list {
+  list-style-type: disc;
+  padding-left: 1.2rem;
+  margin: 0;
+}
+
+.debtor-item {
+  margin-bottom: 0.4rem;
+}
+
+.amount {
+  font-weight: 500;
+  color: #00c896;
+  margin-left: 0.5rem;
+}

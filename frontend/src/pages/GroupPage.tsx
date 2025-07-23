@@ -7,6 +7,17 @@ import Footer from "../components/Footer";
 import GroupTabs from "../components/GroupTabs";
 import ExpensesTab from "../components/ExpensesTab";
 import MembersTab from "../components/MembersTab";
+import SummaryTab from "../components/SummaryTab";
+
+interface Payment {
+  from: string;
+  to: string;
+  amount: number;
+}
+interface SummaryData {
+  balances: { [member: string]: number };
+  payments: Payment[];
+}
 
 interface Group {
   id: string;
@@ -34,6 +45,8 @@ function GroupPage() {
   const [activeTab, setActiveTab] = useState("expenses");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [summary, setSummary] = useState<SummaryData | null>(null);
+
 
   const fetchMembers = async (groupId: string): Promise<string[]> => {
     const res = await fetch(`${API_URL}/groups/${groupId}/members`);
@@ -84,6 +97,18 @@ function GroupPage() {
         .finally(() => setLoading(false));
     }
 
+    if (activeTab === "summary") {
+      fetch(`${API_URL}/groups/${group_id}/summary`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) setError(data.error);
+          else setSummary(data);
+        })
+        .catch(() => setError("Failed to load summary"))
+        .finally(() => setLoading(false));
+    }
+    
+
   }, [activeTab, group_id]);
 
   if (error || !groupInfo) {
@@ -108,8 +133,8 @@ function GroupPage() {
             <MembersTab groupId={group_id!} members={members} />
           )}
 
-          {!loading && activeTab === "summary" && (
-            <div className="tab-placeholder">Summary tab coming soon.</div>
+          {!loading && activeTab === "summary" && summary && (
+            <SummaryTab summary={summary} />
           )}
 
           {!loading && activeTab === "share" && (

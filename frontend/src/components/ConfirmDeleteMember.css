@@ -1,0 +1,20 @@
+.modal-overlay {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  text-align: center;
+}
+
+.modal h2,
+.modal .delete-question,
+.modal .delete-error {
+  margin-bottom: 1rem;
+}
+
+.delete-error {
+  font-weight: bold;
+}
