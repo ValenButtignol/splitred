@@ -17,7 +17,6 @@ interface Props {
     debtors: string[];
   }) => void;
   onDelete?: () => void;
-  groupId: string;
   members: string[];
   editMode?: boolean;
   initialExpense?: {
@@ -28,7 +27,7 @@ interface Props {
 }
 
 
-function ExpenseModal({ onClose, onSubmit, onDelete, groupId, members, editMode, initialExpense }: Props) {
+function ExpenseModal({ onClose, onSubmit, onDelete, members, editMode, initialExpense }: Props) {
   const [step, setStep] = useState(1);
   const [description, setDescription] = useState(initialExpense?.description || "");
   const [creditors, setCreditors] = useState(initialExpense?.creditors || [{ name: "", amount: 0 }]);

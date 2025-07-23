@@ -196,7 +196,7 @@ def register_routes(app):
             creditors = data["creditors"]
             debtors = data["debtors"]
 
-            update_expense(
+            expense = update_expense(
                 expense_repo,
                 group_repo,
                 expense_id,
@@ -206,7 +206,13 @@ def register_routes(app):
                 debtors
             )
 
-            return jsonify({"message": "Expense updated"}), 200
+            return jsonify({
+                "id": str(expense.id),
+                "description": expense.description,
+                "creditors": [{"name": c[0].username, "amount": c[1]} for c in expense.creditors],
+                "debtors": [d.username for d in expense.debtors],
+                "price": expense.total_amount
+            }), 200
 
         except ValueError as e:
             return jsonify({"error": str(e)}), 400

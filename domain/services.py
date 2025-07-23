@@ -165,6 +165,8 @@ def update_expense(
 
     expense_repo.update(expense)
 
+    return expense
+
 def remove_expense(expense_repo: ExpenseRepository, expense_id: str):
     expense_repo.remove(expense_id)
 

@@ -82,14 +82,15 @@ function ExpensesTab({ expenses, groupId, members }: Props) {
           }),
         }
       );
-  
+      
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Failed to update expense");
       }
   
       const updated = await res.json();
-  
+      console.log("Updated from server", updated);
+      
       setAllExpenses((prev) =>
         prev.map((exp) => (exp.id === updated.id ? updated : exp))
       );
@@ -204,7 +205,6 @@ function ExpensesTab({ expenses, groupId, members }: Props) {
           onClose={() => setShowExpenseModal(false)}
           onSubmit={handleAddExpense}
           members={members}
-          groupId={groupId}
         />
       )}
       {expenseToEdit && (
@@ -215,7 +215,6 @@ function ExpensesTab({ expenses, groupId, members }: Props) {
           }
           onDelete={() => handleDeleteExpense(expenseToEdit.id)}
           members={members}
-          groupId={groupId}
           editMode={true}
           initialExpense={expenseToEdit}
         />
