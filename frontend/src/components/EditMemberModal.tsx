@@ -6,9 +6,10 @@ interface Props {
   onCancel: () => void;
   onSave: (name: string) => void;
   title: string;
+  error?: string;
 }
 
-function EditMemberModal({ defaultValue = "", onCancel, onSave, title }: Props) {
+function EditMemberModal({ defaultValue = "", onCancel, onSave, title, error }: Props) {
   const [name, setName] = useState(defaultValue);
 
   return (
@@ -22,9 +23,14 @@ function EditMemberModal({ defaultValue = "", onCancel, onSave, title }: Props) 
           onChange={(e) => setName(e.target.value)}
           className="edit-member-input"
         />
+
+        {error && <p className="delete-error">{error}</p>}
+
         <div className="modal-buttons">
           <button onClick={onCancel}>Cancel</button>
-          <button onClick={() => onSave(name.trim())} disabled={!name.trim()}>Save</button>
+          <button onClick={() => onSave(name.trim())} disabled={!name.trim()}>
+            Save
+          </button>
         </div>
       </div>
     </div>

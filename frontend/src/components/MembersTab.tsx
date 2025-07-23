@@ -59,49 +59,51 @@ function MembersTab({ groupId, members, onUpdate }: Props) {
           },
           body: JSON.stringify({ username: name }),
         });
-
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || "Failed to add member.");
-        }
-
+  
         const data = await res.json();
+  
+        if (!res.ok) {
+          setModalError(data.error || "Failed to add member");
+          return;
+        }
+  
         const updated = [...editableMembers, data.member_username];
         setEditableMembers(updated);
         onUpdate?.(updated);
-      } catch (err) {
-        setError((err as Error).message);
-        setTimeout(() => setError(""), 4000);
+        closeModal();
+      } catch {
+        setModalError("Network error");
       }
     } else if (modalMode === "edit" && selectedIndex !== null) {
       const oldName = editableMembers[selectedIndex];
-
-      fetch(`${API_URL}/groups/${groupId}/members/${oldName}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ new_name: name }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.error) {
-            setModalError(data.error);
-          } else {
-            const updated = [...editableMembers];
-            updated[selectedIndex] = name;
-            setEditableMembers(updated);
-            onUpdate?.(updated);
-            closeModal();
-          }
-        })
-        .catch(() => {
-          setModalError("Failed to update member name");
+  
+      try {
+        const res = await fetch(`${API_URL}/groups/${groupId}/members/${oldName}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ new_name: name }),
         });
+  
+        const data = await res.json();
+  
+        if (!res.ok || data.error) {
+          setModalError(data.error || "Failed to update name");
+          return; // 👈 importante
+        }
+  
+        const updated = [...editableMembers];
+        updated[selectedIndex] = name;
+        setEditableMembers(updated);
+        onUpdate?.(updated);
+        closeModal();
+      } catch {
+        setModalError("Failed to update member name");
+      }
     }
-
-    closeModal();
   };
+  
 
   const handleDelete = (index: number) => {
     setDeleteModalIndex(index);
@@ -169,8 +171,12 @@ function MembersTab({ groupId, members, onUpdate }: Props) {
               ? editableMembers[selectedIndex]
               : ""
           }
-          onCancel={closeModal}
+          onCancel={() => {
+            closeModal();
+            setModalError("");
+          }}
           onSave={handleSaveMember}
+          error={modalError}
         />
       )}
 
@@ -185,8 +191,6 @@ function MembersTab({ groupId, members, onUpdate }: Props) {
           error={deleteError || undefined}
         />
       )}
-
-      {modalError && <p className="text-red-500 text-sm mt-2">{modalError}</p>}
 
     </div>
   );
