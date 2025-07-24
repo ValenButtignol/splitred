@@ -18,7 +18,7 @@ export default function CreateGroupModal({ onClose }: Props) {
   const handleAddMember = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && memberInput.trim() !== "") {
       e.preventDefault();
-      if (!members.includes(memberInput.trim())) {
+      if (!members.includes(memberInput.trim()) && /^[a-zA-Z0-9]+$/.test(memberInput)) {
         setMembers([...members, memberInput.trim()]);
         setMemberInput("");
       }

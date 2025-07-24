@@ -17,7 +17,12 @@ def get_user_by_id(user_repo: UserRepository, user_id: int) -> User:
 
 # MEMBERS
 
-def create_member(member_repo: MemberRepository, username: str, group_id: str) -> Member:
+def create_member(member_repo: MemberRepository, group_repo: GroupRepository, username: str, group_id: str) -> Member | None:
+    group = get_group_by_id(group_repo, group_id)
+
+    if username in [m.username for m in group.members]:
+        raise ValueError("A member with the new name already exists in the group")
+
     new_member = Member(id=0, username=username, group_id=group_id)
     member_repo.add(new_member, group_id)
     return new_member

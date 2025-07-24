@@ -59,7 +59,7 @@ def register_routes(app):
 
             group = create_group(group_repo, name, owner)
             for member in members:
-                m = create_member(member_repo, member, str(group.id))
+                m = create_member(member_repo, group_repo, member, str(group.id))
             session.flush()
 
             return jsonify({
@@ -227,12 +227,13 @@ def register_routes(app):
     def post_member(group_id):
         session = SessionLocal()
         member_repo = SQLAlchemyMemberRepository(session)
+        group_repo = SQLAlchemyGroupRepository(session)
         try:
             data = request.get_json()
             member_username = data["username"]
-            member = create_member(member_repo, member_username, group_id)
+
+            member = create_member(member_repo, group_repo, member_username, group_id)
             
-            session.commit()
             return jsonify({
                 "id": member.id,
                 "member_username": member.username,

@@ -50,6 +50,10 @@ function MembersTab({ groupId, members, onUpdate }: Props) {
   const visibleMembers = showMore ? editableMembers : editableMembers.slice(0, 5);
 
   const handleSaveMember = async (name: string) => {
+    if (!/^[a-zA-Z0-9]+$/.test(name)) {
+      setModalError("Only letters and numbers are allowed");
+      return;
+    }
     if (modalMode === "add") {
       try {
         const res = await fetch(`${API_URL}/groups/${groupId}/members`, {
