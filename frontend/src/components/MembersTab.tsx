@@ -20,7 +20,7 @@ function MembersTab({ groupId, members, onUpdate }: Props) {
   const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showMore, setShowMore] = useState(false);
-  const [error, setError] = useState("");
+  const [error, ] = useState("");
   const [deleteModalIndex, setDeleteModalIndex] = useState<number | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [modalError, setModalError] = useState("");

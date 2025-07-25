@@ -157,7 +157,7 @@ function GroupPage() {
           )}
 
           {!loading && activeTab === "share" && (
-            <ShareTab groupId={group_id!} ownerId={owner_id!} />
+            <ShareTab groupId={group_id!} />
           )}
         </div>
       </section>
