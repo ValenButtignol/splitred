@@ -6,3 +6,6 @@ dev.sqlite3
 *.db
 
 .idea/
+
+.env
+*.pyc
