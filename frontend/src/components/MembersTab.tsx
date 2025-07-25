@@ -1,10 +1,10 @@
 import { useState } from "react";
 import "./MembersTab.css";
-import plusIcon from "../assets/plus-icon.svg";
-import editIcon from "../assets/edit-icon.svg";
-import deleteIcon from "../assets/delete-icon.svg";
-import showMoreIcon from "../assets/show-more-icon.svg"
-import showLessIcon from "../assets/show-less-icon.svg"
+import plusIcon from "/assets/plus-icon.svg";
+import editIcon from "/assets/edit-icon.svg";
+import deleteIcon from "/assets/delete-icon.svg";
+import showMoreIcon from "/assets/show-more-icon.svg"
+import showLessIcon from "/assets/show-less-icon.svg"
 import EditMemberModal from "./EditMemberModal";
 import { API_URL } from "../lib/constants";
 import ConfirmDeleteMember from "./ConfirmDeleteMember";

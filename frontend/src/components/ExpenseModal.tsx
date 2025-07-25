@@ -1,12 +1,12 @@
 import { useState } from "react";
 import "./ExpenseModal.css";
-import plusIcon from "../assets/plus-icon.svg";
-import deleteIcon from "../assets/delete-icon.svg";
-import deleteIcon2 from "../assets/delete-icon2.svg";
-import crossIcon from "../assets/cross-icon.svg";
-import leftIcon from "../assets/left-icon.svg";
-import rightIcon from "../assets/right-icon.svg";
-import checkIcon from "../assets/check-icon.svg";
+import plusIcon from "/assets/plus-icon.svg";
+import deleteIcon from "/assets/delete-icon.svg";
+import deleteIcon2 from "/assets/delete-icon2.svg";
+import crossIcon from "/assets/cross-icon.svg";
+import leftIcon from "/assets/left-icon.svg";
+import rightIcon from "/assets/right-icon.svg";
+import checkIcon from "/assets/check-icon.svg";
 
 interface Props {
   onClose: () => void;
