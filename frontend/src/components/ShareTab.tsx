@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./ShareTab.css";
-import copyIcon from "/assets/copy-icon.svg";
+import copyIcon from "../assets/copy-icon.svg";
 
 interface Props {
   groupId: string;

@@ -5,6 +5,10 @@ import CreateGroupModal from "./CreateGroupModal";
 import JoinGroupModal from "./JoinGroupModal";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../lib/constants";
+import joinIcon from "../assets/join-icon.svg";
+import plusIcon from "../assets/plus-icon.svg";
+import showMoreIcon from "../assets/show-more-icon.svg";
+import showLessIcon from "../assets/show-less-icon.svg";
 
 interface Group {
   id: string;
@@ -64,7 +68,7 @@ function GroupList() {
         <div className="group-buttons">
           <button className="circle-button" onClick={() => setShowJoinGroupModal(true)}>
             <img 
-              src={"./src/assets/join-icon.svg"} 
+              src={ joinIcon } 
               alt="join-icon"
               width={17}
               height={17}
@@ -77,8 +81,8 @@ function GroupList() {
               <img 
                 src={
                   showMore
-                    ? "./src/assets/show-less-icon.svg"
-                    : "./src/assets/show-more-icon.svg"
+                    ? showMoreIcon
+                    : showLessIcon
                 }
                 alt={showMore ? "show-less-icon" : "show-more-icon"}
                 width={17}
@@ -90,7 +94,7 @@ function GroupList() {
 
           <button className="circle-button" onClick={() => setShowCreateGroupModal(true)}>
             <img
-              src={"./src/assets/plus-icon.svg"}
+              src={ plusIcon }
               alt="create-group-icon"
               width={17}
               height={17}

@@ -3,9 +3,9 @@
 import "./ExpensesTab.css";
 import { useEffect, useState } from "react";
 import ExpenseModal from "./ExpenseModal";
-import plusIcon from "/assets/plus-icon.svg";
-import showMoreIcon from "/assets/show-more-icon.svg";
-import showLessIcon from "/assets/show-less-icon.svg";
+import plusIcon from "../assets/plus-icon.svg";
+import showMoreIcon from "../assets/show-more-icon.svg";
+import showLessIcon from "../assets/show-less-icon.svg";
 import { API_URL } from "../lib/constants";
 
 interface Expense {

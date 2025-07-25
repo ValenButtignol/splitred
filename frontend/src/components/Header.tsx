@@ -3,10 +3,10 @@ import "./Header.css";
 import { useNavigate } from "react-router-dom";
 import FeedbackModal from "./FeedbackModal";
 import DonationModal from "./DonationModal";
-import splitredLogo from "/assets/splitred-logo.svg";
-import infoIcon from "/assets/info-icon.svg";
-import feedbackIcon from "/assets/feedback-icon.svg";;
-import donateIcon from "/assets/donate-icon.svg";;
+import splitredLogo from "../assets/splitred-logo.svg";
+import infoIcon from "../assets/info-icon.svg";
+import feedbackIcon from "../assets/feedback-icon.svg";;
+import donateIcon from "../assets/donate-icon.svg";;
 
 function Header() {
   const navigate = useNavigate();
