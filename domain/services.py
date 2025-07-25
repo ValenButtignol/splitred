@@ -77,7 +77,7 @@ def create_group(group_repo: GroupRepository, name: str, owner: User) -> Group:
 def add_owner_to_group(group_repo: GroupRepository, group_id: str, owner: User):
     group = get_group_by_id(group_repo, group_id)
     if owner in group.owners:
-        raise ValueError("Owner is already in the group")
+        raise ValueError("You are already in the group")
     group_repo.add_owner(group_id, owner)
 
 def add_member_to_group(group_repo: GroupRepository, group_id: str, member: Member):

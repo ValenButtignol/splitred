@@ -1,24 +1,48 @@
 import "./CreateGroupModal.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../lib/constants";
 
 type Props = {
   onClose: () => void;
 };
 
 export default function JoinGroupModal({ onClose }: Props) {
-  const [invitationLink, setInvitationLink] = useState("");
+  const [groupIdInput, setGroupIdInput] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (invitationLink.trim() === "") return;
+    setError("");
 
-    // TODO: Acá podrías hacer un POST al backend y obtener un ID real
-    const fakeGroupId = encodeURIComponent(invitationLink.trim());
+    const groupId = groupIdInput.trim();
+    const userId = localStorage.getItem("user_id");
 
-    navigate(`/group/${fakeGroupId}`);
-    onClose();
+    if (!groupId || !userId) {
+      setError("Group ID and User ID are required.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/groups/${groupId}/join`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user_id: userId }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Error joining group");
+      }
+
+      navigate(`/groups/${groupId}?owner_id=${userId}`);
+      onClose();
+    } catch (err: any) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -28,11 +52,12 @@ export default function JoinGroupModal({ onClose }: Props) {
         <form onSubmit={handleSubmit} className="modal-form">
           <input
             type="text"
-            placeholder="Invitation link"
-            value={invitationLink}
-            onChange={(e) => setInvitationLink(e.target.value)}
+            placeholder="Enter group ID"
+            value={groupIdInput}
+            onChange={(e) => setGroupIdInput(e.target.value)}
             className="modal-input"
           />
+          {error && <p className="delete-error">{error}</p>}
           <button type="submit" className="modal-button">
             Join
           </button>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./Header.css";
 import { useNavigate } from "react-router-dom";
 import FeedbackModal from "./FeedbackModal";
+import DonationModal from "./DonationModal";
 import splitredLogo from "../assets/splitred-logo.svg";
 import infoIcon from "../assets/info-icon.svg";
 import feedbackIcon from "../assets/feedback-icon.svg";;
@@ -10,6 +11,7 @@ import donateIcon from "../assets/donate-icon.svg";;
 function Header() {
   const navigate = useNavigate();
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showDonation, setShowDonation] = useState(false);
 
   return (
     <header className="header">
@@ -24,7 +26,7 @@ function Header() {
           src={donateIcon}
           alt="donate-icon"
           className="donate-icon"
-          onClick={() => navigate("/info")}
+          onClick={() => setShowDonation(true)}
         />
         <img
           src={feedbackIcon}
@@ -40,6 +42,7 @@ function Header() {
           />
       </div>
       {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
+      {showDonation && <DonationModal onClose={() => setShowDonation(false)} />}
     </header>
   );
 }

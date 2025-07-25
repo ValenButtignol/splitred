@@ -1,4 +1,4 @@
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./GroupPage.css";
 import { API_URL } from "../lib/constants";
@@ -8,6 +8,7 @@ import GroupTabs from "../components/GroupTabs";
 import ExpensesTab from "../components/ExpensesTab";
 import MembersTab from "../components/MembersTab";
 import SummaryTab from "../components/SummaryTab";
+import ShareTab from "../components/ShareTab";
 
 interface Payment {
   from: string;
@@ -38,6 +39,7 @@ function GroupPage() {
   const { group_id } = useParams();
   const [searchParams] = useSearchParams();
   const owner_id = searchParams.get("owner_id");
+  const navigate = useNavigate();
 
   const [groupInfo, setGroupInfo] = useState<Group | null>(null);
   const [expenses, setExpenses] = useState<Expense[] | null>(null);
@@ -46,7 +48,7 @@ function GroupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<SummaryData | null>(null);
-
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const fetchMembers = async (groupId: string): Promise<string[]> => {
     const res = await fetch(`${API_URL}/groups/${groupId}/members`);
@@ -59,6 +61,8 @@ function GroupPage() {
   // Fetch main group info once
   useEffect(() => {
     if (!group_id || !owner_id) return;
+  
+    setInitialLoad(true);
     fetch(`${API_URL}/groups/${group_id}?owner_id=${owner_id}`)
       .then((res) => res.json())
       .then((data) => {
@@ -68,8 +72,10 @@ function GroupPage() {
           setMembers(data.members);
         }
       })
-      .catch(() => setError("Failed to load group"));
+      .catch(() => setError("Failed to load group"))
+      .finally(() => setInitialLoad(false));
   }, [group_id, owner_id]);
+  
 
   // Fetch tab-specific data
   useEffect(() => {
@@ -107,13 +113,26 @@ function GroupPage() {
         .catch(() => setError("Failed to load summary"))
         .finally(() => setLoading(false));
     }
-    
+
+    if (activeTab === "share") {
+      setLoading(false);
+    }
 
   }, [activeTab, group_id]);
 
-  if (error || !groupInfo) {
+  if (initialLoad) {
+    return <div className="group-loading">Loading group...</div>;
+  }
+  
+  if (error) {
+    if (error === "Access denied: not an owner of this group") {
+      navigate("/");
+      return null;
+    }
     return <div className="group-error">⚠️ {error || "Something went wrong"} ⚠️</div>;
   }
+  
+  if (!groupInfo) return null;  
 
   return (
     <div className="group-wrapper">
@@ -138,7 +157,7 @@ function GroupPage() {
           )}
 
           {!loading && activeTab === "share" && (
-            <div className="tab-placeholder">Share tab coming soon.</div>
+            <ShareTab groupId={group_id!} ownerId={owner_id!} />
           )}
         </div>
       </section>

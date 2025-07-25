@@ -15,8 +15,7 @@ export default function FeedbackModal({ onClose }: Props) {
     if (message.trim().length < 3) return;
 
     try {
-      // TODO: Reemplazar por tu backend real
-      // Por ahora simula un envío:
+      // TODO: Replace for real backend
       await new Promise((res) => setTimeout(res, 1000));
       setStatus("sent");
       setTimeout(onClose, 1500);

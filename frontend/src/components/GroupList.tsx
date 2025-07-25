@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import CreateGroupModal from "./CreateGroupModal";
 import JoinGroupModal from "./JoinGroupModal";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../lib/constants";
 
 interface Group {
   id: string;
@@ -23,7 +24,7 @@ function GroupList() {
   useEffect(() => {
     if (!userId) return;
   
-    fetch(`http://localhost:5000/groups?owner_id=${userId}`)
+    fetch(`${API_URL}/groups?owner_id=${userId}`)
       .then(res => res.json())
       .then(data => {
         const sorted = data.sort((a: Group, b: Group) =>

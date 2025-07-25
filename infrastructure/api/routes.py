@@ -1,5 +1,5 @@
 from flask import request, jsonify, session
-from domain.services import calculate_group_balance, calculate_payments, create_expense, create_user, create_group, create_member, edit_member_name_in_group, get_expenses_by_group_id, get_groups_by_owner_id, get_member_by_id, get_member_by_username_and_group, get_members_by_group_id, get_user_by_id, add_member_to_group, get_group_by_id, remove_expense, remove_member_from_group, update_expense
+from domain.services import add_owner_to_group, calculate_group_balance, calculate_payments, create_expense, create_user, create_group, create_member, edit_member_name_in_group, get_expenses_by_group_id, get_groups_by_owner_id, get_member_by_id, get_member_by_username_and_group, get_members_by_group_id, get_user_by_id, add_member_to_group, get_group_by_id, remove_expense, remove_member_from_group, update_expense
 from infrastructure.db.repository import SQLAlchemyUserRepository, SQLAlchemyGroupRepository, SQLAlchemyMemberRepository, SQLAlchemyExpenseRepository
 from infrastructure.db import SessionLocal
 from infrastructure.db.models import UserDB
@@ -76,6 +76,33 @@ def register_routes(app):
         finally:
             session.close()
 
+    @app.route("/groups/<group_id>/join", methods=["POST"])
+    def join_group(group_id: str):
+        session = SessionLocal()
+        group_repo = SQLAlchemyGroupRepository(session)
+        user_repo = SQLAlchemyUserRepository(session)
+        try:
+            data = request.get_json()
+            user_id = data.get("user_id")
+            if not user_id:
+                return jsonify({"error": "user_id is required"}), 400
+            new_owner = get_user_by_id(user_repo, user_id)
+            
+            if not new_owner:
+                return jsonify({"error": "User not found"}), 404
+
+            group = get_group_by_id(group_repo, group_id)
+            if not group:
+                return jsonify({"error": "Group not found"}), 404
+
+            add_owner_to_group(group_repo, group_id, new_owner)
+            return jsonify({"message": "User added as owner"}), 200
+
+        except Exception as e:
+            session.rollback()
+            return jsonify({"error": str(e)}), 500
+        finally:
+            session.close()
 
     @app.route("/groups", methods=["GET"])
     def get_groups():
