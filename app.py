@@ -6,7 +6,7 @@ from infrastructure.api.routes import register_routes
 from infrastructure.db import init_db
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from config import FRONTEND_URL
+from config import Config
 
 def create_app():
     app = Flask(__name__)
@@ -14,7 +14,7 @@ def create_app():
     limiter = Limiter(get_remote_address, app=app, default_limits=["60 per minute"])
     
     # Enable CORS for all routes
-    CORS(app, origins=FRONTEND_URL)
+    CORS(app, origins=app.config["FRONTEND_URL"])
     
     init_db()
     register_routes(app, limiter)
